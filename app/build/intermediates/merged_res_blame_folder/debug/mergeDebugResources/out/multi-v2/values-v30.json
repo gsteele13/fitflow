@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.fitflow.app-mergeDebugResources-61:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "/Users/gsteele/.gradle/caches/9.0.0/transforms/36423d27c2613730136edf4c88c7f452/transformed/jetified-material3-release/res/values-v30/values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "72",
+                        "endOffsets": "123"
+                    }
+                }
+            ]
+        }
+    ]
+}

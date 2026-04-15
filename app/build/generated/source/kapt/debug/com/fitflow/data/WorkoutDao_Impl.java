@@ -1,0 +1,830 @@
+package com.fitflow.data;
+
+import android.database.Cursor;
+import android.os.CancellationSignal;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.room.CoroutinesRoom;
+import androidx.room.EntityDeletionOrUpdateAdapter;
+import androidx.room.EntityInsertionAdapter;
+import androidx.room.RoomDatabase;
+import androidx.room.RoomSQLiteQuery;
+import androidx.room.SharedSQLiteStatement;
+import androidx.room.util.CursorUtil;
+import androidx.room.util.DBUtil;
+import androidx.sqlite.db.SupportSQLiteStatement;
+import java.lang.Class;
+import java.lang.Exception;
+import java.lang.Long;
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.String;
+import java.lang.SuppressWarnings;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+import javax.annotation.processing.Generated;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlinx.coroutines.flow.Flow;
+
+@Generated("androidx.room.RoomProcessor")
+@SuppressWarnings({"unchecked", "deprecation"})
+public final class WorkoutDao_Impl implements WorkoutDao {
+  private final RoomDatabase __db;
+
+  private final EntityInsertionAdapter<Activity> __insertionAdapterOfActivity;
+
+  private final EntityInsertionAdapter<Plan> __insertionAdapterOfPlan;
+
+  private final EntityInsertionAdapter<PlanActivity> __insertionAdapterOfPlanActivity;
+
+  private final EntityInsertionAdapter<HistoryEntry> __insertionAdapterOfHistoryEntry;
+
+  private final Converters __converters = new Converters();
+
+  private final EntityDeletionOrUpdateAdapter<Plan> __updateAdapterOfPlan;
+
+  private final EntityDeletionOrUpdateAdapter<PlanActivity> __updateAdapterOfPlanActivity;
+
+  private final SharedSQLiteStatement __preparedStmtOfDeletePlanActivity;
+
+  public WorkoutDao_Impl(@NonNull final RoomDatabase __db) {
+    this.__db = __db;
+    this.__insertionAdapterOfActivity = new EntityInsertionAdapter<Activity>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR REPLACE INTO `activities` (`id`,`name`,`description`) VALUES (nullif(?, 0),?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final Activity entity) {
+        statement.bindLong(1, entity.getId());
+        if (entity.getName() == null) {
+          statement.bindNull(2);
+        } else {
+          statement.bindString(2, entity.getName());
+        }
+        if (entity.getDescription() == null) {
+          statement.bindNull(3);
+        } else {
+          statement.bindString(3, entity.getDescription());
+        }
+      }
+    };
+    this.__insertionAdapterOfPlan = new EntityInsertionAdapter<Plan>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR REPLACE INTO `plans` (`id`,`name`,`isActive`) VALUES (nullif(?, 0),?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final Plan entity) {
+        statement.bindLong(1, entity.getId());
+        if (entity.getName() == null) {
+          statement.bindNull(2);
+        } else {
+          statement.bindString(2, entity.getName());
+        }
+        final int _tmp = entity.isActive() ? 1 : 0;
+        statement.bindLong(3, _tmp);
+      }
+    };
+    this.__insertionAdapterOfPlanActivity = new EntityInsertionAdapter<PlanActivity>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR REPLACE INTO `plan_activities` (`id`,`planId`,`activityId`,`dayOfWeek`,`isActive`) VALUES (nullif(?, 0),?,?,?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final PlanActivity entity) {
+        statement.bindLong(1, entity.getId());
+        statement.bindLong(2, entity.getPlanId());
+        statement.bindLong(3, entity.getActivityId());
+        statement.bindLong(4, entity.getDayOfWeek());
+        final int _tmp = entity.isActive() ? 1 : 0;
+        statement.bindLong(5, _tmp);
+      }
+    };
+    this.__insertionAdapterOfHistoryEntry = new EntityInsertionAdapter<HistoryEntry>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR REPLACE INTO `history` (`id`,`dateTime`,`type`,`name`,`description`,`notes`,`status`) VALUES (nullif(?, 0),?,?,?,?,?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final HistoryEntry entity) {
+        statement.bindLong(1, entity.getId());
+        final Long _tmp = __converters.dateToTimestamp(entity.getDateTime());
+        if (_tmp == null) {
+          statement.bindNull(2);
+        } else {
+          statement.bindLong(2, _tmp);
+        }
+        if (entity.getType() == null) {
+          statement.bindNull(3);
+        } else {
+          statement.bindString(3, entity.getType());
+        }
+        if (entity.getName() == null) {
+          statement.bindNull(4);
+        } else {
+          statement.bindString(4, entity.getName());
+        }
+        if (entity.getDescription() == null) {
+          statement.bindNull(5);
+        } else {
+          statement.bindString(5, entity.getDescription());
+        }
+        if (entity.getNotes() == null) {
+          statement.bindNull(6);
+        } else {
+          statement.bindString(6, entity.getNotes());
+        }
+        final String _tmp_1 = __converters.fromStatus(entity.getStatus());
+        if (_tmp_1 == null) {
+          statement.bindNull(7);
+        } else {
+          statement.bindString(7, _tmp_1);
+        }
+      }
+    };
+    this.__updateAdapterOfPlan = new EntityDeletionOrUpdateAdapter<Plan>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "UPDATE OR ABORT `plans` SET `id` = ?,`name` = ?,`isActive` = ? WHERE `id` = ?";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final Plan entity) {
+        statement.bindLong(1, entity.getId());
+        if (entity.getName() == null) {
+          statement.bindNull(2);
+        } else {
+          statement.bindString(2, entity.getName());
+        }
+        final int _tmp = entity.isActive() ? 1 : 0;
+        statement.bindLong(3, _tmp);
+        statement.bindLong(4, entity.getId());
+      }
+    };
+    this.__updateAdapterOfPlanActivity = new EntityDeletionOrUpdateAdapter<PlanActivity>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "UPDATE OR ABORT `plan_activities` SET `id` = ?,`planId` = ?,`activityId` = ?,`dayOfWeek` = ?,`isActive` = ? WHERE `id` = ?";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final PlanActivity entity) {
+        statement.bindLong(1, entity.getId());
+        statement.bindLong(2, entity.getPlanId());
+        statement.bindLong(3, entity.getActivityId());
+        statement.bindLong(4, entity.getDayOfWeek());
+        final int _tmp = entity.isActive() ? 1 : 0;
+        statement.bindLong(5, _tmp);
+        statement.bindLong(6, entity.getId());
+      }
+    };
+    this.__preparedStmtOfDeletePlanActivity = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "DELETE FROM plan_activities WHERE id = ?";
+        return _query;
+      }
+    };
+  }
+
+  @Override
+  public Object insertActivity(final Activity activity,
+      final Continuation<? super Long> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
+      @Override
+      @NonNull
+      public Long call() throws Exception {
+        __db.beginTransaction();
+        try {
+          final Long _result = __insertionAdapterOfActivity.insertAndReturnId(activity);
+          __db.setTransactionSuccessful();
+          return _result;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object insertPlan(final Plan plan, final Continuation<? super Long> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
+      @Override
+      @NonNull
+      public Long call() throws Exception {
+        __db.beginTransaction();
+        try {
+          final Long _result = __insertionAdapterOfPlan.insertAndReturnId(plan);
+          __db.setTransactionSuccessful();
+          return _result;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object insertPlanActivity(final PlanActivity planActivity,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __insertionAdapterOfPlanActivity.insert(planActivity);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object insertHistoryEntry(final HistoryEntry entry,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __insertionAdapterOfHistoryEntry.insert(entry);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object updatePlan(final Plan plan, final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __updateAdapterOfPlan.handle(plan);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object updatePlanActivity(final PlanActivity planActivity,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __updateAdapterOfPlanActivity.handle(planActivity);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deletePlanActivity(final long id, final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final SupportSQLiteStatement _stmt = __preparedStmtOfDeletePlanActivity.acquire();
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, id);
+        try {
+          __db.beginTransaction();
+          try {
+            _stmt.executeUpdateDelete();
+            __db.setTransactionSuccessful();
+            return Unit.INSTANCE;
+          } finally {
+            __db.endTransaction();
+          }
+        } finally {
+          __preparedStmtOfDeletePlanActivity.release(_stmt);
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Flow<List<Activity>> getAllActivities() {
+    final String _sql = "SELECT * FROM activities";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"activities"}, new Callable<List<Activity>>() {
+      @Override
+      @NonNull
+      public List<Activity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final List<Activity> _result = new ArrayList<Activity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final Activity _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            _item = new Activity(_tmpId,_tmpName,_tmpDescription);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<List<Plan>> getAllPlans() {
+    final String _sql = "SELECT * FROM plans";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"plans"}, new Callable<List<Plan>>() {
+      @Override
+      @NonNull
+      public List<Plan> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfIsActive = CursorUtil.getColumnIndexOrThrow(_cursor, "isActive");
+          final List<Plan> _result = new ArrayList<Plan>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final Plan _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final boolean _tmpIsActive;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp != 0;
+            _item = new Plan(_tmpId,_tmpName,_tmpIsActive);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<List<PlanActivity>> getActivitiesForPlan(final long planId) {
+    final String _sql = "SELECT * FROM plan_activities WHERE planId = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, planId);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"plan_activities"}, new Callable<List<PlanActivity>>() {
+      @Override
+      @NonNull
+      public List<PlanActivity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfPlanId = CursorUtil.getColumnIndexOrThrow(_cursor, "planId");
+          final int _cursorIndexOfActivityId = CursorUtil.getColumnIndexOrThrow(_cursor, "activityId");
+          final int _cursorIndexOfDayOfWeek = CursorUtil.getColumnIndexOrThrow(_cursor, "dayOfWeek");
+          final int _cursorIndexOfIsActive = CursorUtil.getColumnIndexOrThrow(_cursor, "isActive");
+          final List<PlanActivity> _result = new ArrayList<PlanActivity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final PlanActivity _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final long _tmpPlanId;
+            _tmpPlanId = _cursor.getLong(_cursorIndexOfPlanId);
+            final long _tmpActivityId;
+            _tmpActivityId = _cursor.getLong(_cursorIndexOfActivityId);
+            final int _tmpDayOfWeek;
+            _tmpDayOfWeek = _cursor.getInt(_cursorIndexOfDayOfWeek);
+            final boolean _tmpIsActive;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp != 0;
+            _item = new PlanActivity(_tmpId,_tmpPlanId,_tmpActivityId,_tmpDayOfWeek,_tmpIsActive);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<List<Activity>> getScheduledActivitiesForDay(final int dayOfWeek) {
+    final String _sql = "\n"
+            + "        SELECT a.*, pa.dayOfWeek, pa.isActive as paIsActive, p.isActive as pIsActive \n"
+            + "        FROM activities a \n"
+            + "        JOIN plan_activities pa ON a.id = pa.activityId \n"
+            + "        JOIN plans p ON pa.planId = p.id \n"
+            + "        WHERE pa.dayOfWeek = ? AND pa.isActive = 1 AND p.isActive = 1\n"
+            + "    ";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, dayOfWeek);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"activities", "plan_activities",
+        "plans"}, new Callable<List<Activity>>() {
+      @Override
+      @NonNull
+      public List<Activity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final List<Activity> _result = new ArrayList<Activity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final Activity _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            _item = new Activity(_tmpId,_tmpName,_tmpDescription);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<List<HistoryEntry>> getAllHistory() {
+    final String _sql = "SELECT * FROM history ORDER BY dateTime DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"history"}, new Callable<List<HistoryEntry>>() {
+      @Override
+      @NonNull
+      public List<HistoryEntry> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfDateTime = CursorUtil.getColumnIndexOrThrow(_cursor, "dateTime");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+          final int _cursorIndexOfStatus = CursorUtil.getColumnIndexOrThrow(_cursor, "status");
+          final List<HistoryEntry> _result = new ArrayList<HistoryEntry>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final HistoryEntry _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final LocalDateTime _tmpDateTime;
+            final Long _tmp;
+            if (_cursor.isNull(_cursorIndexOfDateTime)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getLong(_cursorIndexOfDateTime);
+            }
+            _tmpDateTime = __converters.fromTimestamp(_tmp);
+            final String _tmpType;
+            if (_cursor.isNull(_cursorIndexOfType)) {
+              _tmpType = null;
+            } else {
+              _tmpType = _cursor.getString(_cursorIndexOfType);
+            }
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            final String _tmpNotes;
+            if (_cursor.isNull(_cursorIndexOfNotes)) {
+              _tmpNotes = null;
+            } else {
+              _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
+            }
+            final HistoryStatus _tmpStatus;
+            final String _tmp_1;
+            if (_cursor.isNull(_cursorIndexOfStatus)) {
+              _tmp_1 = null;
+            } else {
+              _tmp_1 = _cursor.getString(_cursorIndexOfStatus);
+            }
+            _tmpStatus = __converters.toStatus(_tmp_1);
+            _item = new HistoryEntry(_tmpId,_tmpDateTime,_tmpType,_tmpName,_tmpDescription,_tmpNotes,_tmpStatus);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<List<HistoryEntry>> getHistoryInRange(final LocalDateTime start,
+      final LocalDateTime end) {
+    final String _sql = "SELECT * FROM history WHERE dateTime BETWEEN ? AND ? ORDER BY dateTime DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
+    int _argIndex = 1;
+    final Long _tmp = __converters.dateToTimestamp(start);
+    if (_tmp == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp);
+    }
+    _argIndex = 2;
+    final Long _tmp_1 = __converters.dateToTimestamp(end);
+    if (_tmp_1 == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp_1);
+    }
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"history"}, new Callable<List<HistoryEntry>>() {
+      @Override
+      @NonNull
+      public List<HistoryEntry> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfDateTime = CursorUtil.getColumnIndexOrThrow(_cursor, "dateTime");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final int _cursorIndexOfNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "notes");
+          final int _cursorIndexOfStatus = CursorUtil.getColumnIndexOrThrow(_cursor, "status");
+          final List<HistoryEntry> _result = new ArrayList<HistoryEntry>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final HistoryEntry _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final LocalDateTime _tmpDateTime;
+            final Long _tmp_2;
+            if (_cursor.isNull(_cursorIndexOfDateTime)) {
+              _tmp_2 = null;
+            } else {
+              _tmp_2 = _cursor.getLong(_cursorIndexOfDateTime);
+            }
+            _tmpDateTime = __converters.fromTimestamp(_tmp_2);
+            final String _tmpType;
+            if (_cursor.isNull(_cursorIndexOfType)) {
+              _tmpType = null;
+            } else {
+              _tmpType = _cursor.getString(_cursorIndexOfType);
+            }
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            final String _tmpNotes;
+            if (_cursor.isNull(_cursorIndexOfNotes)) {
+              _tmpNotes = null;
+            } else {
+              _tmpNotes = _cursor.getString(_cursorIndexOfNotes);
+            }
+            final HistoryStatus _tmpStatus;
+            final String _tmp_3;
+            if (_cursor.isNull(_cursorIndexOfStatus)) {
+              _tmp_3 = null;
+            } else {
+              _tmp_3 = _cursor.getString(_cursorIndexOfStatus);
+            }
+            _tmpStatus = __converters.toStatus(_tmp_3);
+            _item = new HistoryEntry(_tmpId,_tmpDateTime,_tmpType,_tmpName,_tmpDescription,_tmpNotes,_tmpStatus);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<List<PlanActivityWithDetails>> getPlanActivitiesWithDetails(final long planId) {
+    final String _sql = "\n"
+            + "        SELECT pa.id, pa.planId, pa.activityId, a.name, a.description, pa.dayOfWeek, pa.isActive \n"
+            + "        FROM plan_activities pa \n"
+            + "        JOIN activities a ON pa.activityId = a.id \n"
+            + "        WHERE pa.planId = ?\n"
+            + "    ";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, planId);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"plan_activities",
+        "activities"}, new Callable<List<PlanActivityWithDetails>>() {
+      @Override
+      @NonNull
+      public List<PlanActivityWithDetails> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = 0;
+          final int _cursorIndexOfPlanId = 1;
+          final int _cursorIndexOfActivityId = 2;
+          final int _cursorIndexOfName = 3;
+          final int _cursorIndexOfDescription = 4;
+          final int _cursorIndexOfDayOfWeek = 5;
+          final int _cursorIndexOfIsActive = 6;
+          final List<PlanActivityWithDetails> _result = new ArrayList<PlanActivityWithDetails>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final PlanActivityWithDetails _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final long _tmpPlanId;
+            _tmpPlanId = _cursor.getLong(_cursorIndexOfPlanId);
+            final long _tmpActivityId;
+            _tmpActivityId = _cursor.getLong(_cursorIndexOfActivityId);
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            final int _tmpDayOfWeek;
+            _tmpDayOfWeek = _cursor.getInt(_cursorIndexOfDayOfWeek);
+            final boolean _tmpIsActive;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp != 0;
+            _item = new PlanActivityWithDetails(_tmpId,_tmpPlanId,_tmpActivityId,_tmpName,_tmpDescription,_tmpDayOfWeek,_tmpIsActive);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Object getActivityById(final long id, final Continuation<? super Activity> $completion) {
+    final String _sql = "SELECT * FROM activities WHERE id = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, id);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<Activity>() {
+      @Override
+      @Nullable
+      public Activity call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final Activity _result;
+          if (_cursor.moveToFirst()) {
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            _result = new Activity(_tmpId,_tmpName,_tmpDescription);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
+  }
+
+  @NonNull
+  public static List<Class<?>> getRequiredConverters() {
+    return Collections.emptyList();
+  }
+}

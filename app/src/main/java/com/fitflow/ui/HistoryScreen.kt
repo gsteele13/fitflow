@@ -60,6 +60,40 @@ fun HistoryScreen(viewModel: WorkoutViewModel = viewModel()) {
 }
 
 @Composable
+fun HistoryItem(entry: HistoryEntry) {
+    val backgroundColor = when (entry.status) {
+        HistoryStatus.COMPLETED -> Color.Green.copy(alpha = 0.2f)
+        HistoryStatus.SKIPPED -> Color.Yellow.copy(alpha = 0.2f)
+        HistoryStatus.UNCOMPLETED -> Color.Red.copy(alpha = 0.2f)
+        HistoryStatus.NOTE -> Color.Gray.copy(alpha = 0.2f)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Column(modifier = Modifier
+            .background(backgroundColor)
+            .padding(16.dp)
+            .fillMaxWidth()
+        ) {
+            Text(text = entry.name, style = MaterialTheme.typography.titleMedium)
+            if (entry.description.isNotEmpty()) {
+                Text(text = entry.description, style = MaterialTheme.typography.bodySmall)
+            }
+            if (entry.notes.isNotEmpty()) {
+                Text(text = "Notes: ${entry.notes}", style = MaterialTheme.typography.bodyMedium)
+            }
+            Text(
+                text = entry.dateTime.format(DateTimeFormatter.ofPattern("MMM d, yyyy HH:mm")),
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
+@Composable
 fun ExportHistoryDialog(onDismiss: () -> Unit, onExport: (String, String) -> Unit) {
     var exportType by remember { mutableStateOf("CSV") }
     var dateRange by remember { mutableStateOf("All Dates") }

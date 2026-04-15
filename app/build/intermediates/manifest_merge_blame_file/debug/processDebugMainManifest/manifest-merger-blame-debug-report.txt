@@ -1,0 +1,184 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.fitflow"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+11-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:4:5-77
+11-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:4:22-74
+12    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+12-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:5:5-81
+12-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:5:22-78
+13
+14    <permission
+14-->[androidx.core:core:1.15.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/6b5be532c9809ada4980149ff49b2c6b/transformed/core-1.15.0/AndroidManifest.xml:22:5-24:47
+15        android:name="com.fitflow.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+15-->[androidx.core:core:1.15.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/6b5be532c9809ada4980149ff49b2c6b/transformed/core-1.15.0/AndroidManifest.xml:23:9-81
+16        android:protectionLevel="signature" />
+16-->[androidx.core:core:1.15.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/6b5be532c9809ada4980149ff49b2c6b/transformed/core-1.15.0/AndroidManifest.xml:24:9-44
+17
+18    <uses-permission android:name="com.fitflow.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+18-->[androidx.core:core:1.15.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/6b5be532c9809ada4980149ff49b2c6b/transformed/core-1.15.0/AndroidManifest.xml:26:5-97
+18-->[androidx.core:core:1.15.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/6b5be532c9809ada4980149ff49b2c6b/transformed/core-1.15.0/AndroidManifest.xml:26:22-94
+19
+20    <application
+20-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:7:5-39:19
+21        android:allowBackup="true"
+21-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:8:9-35
+22        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+22-->[androidx.core:core:1.15.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/6b5be532c9809ada4980149ff49b2c6b/transformed/core-1.15.0/AndroidManifest.xml:28:18-86
+23        android:debuggable="true"
+24        android:extractNativeLibs="false"
+25        android:label="FitFlow"
+25-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:9:9-32
+26        android:supportsRtl="true"
+26-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:10:9-35
+27        android:theme="@style/Theme.FitFlow" >
+27-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:11:9-45
+28        <activity
+28-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:12:9-19:20
+29            android:name="com.fitflow.MainActivity"
+29-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:13:13-41
+30            android:exported="true" >
+30-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:14:13-36
+31            <intent-filter>
+31-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:15:13-18:29
+32                <action android:name="android.intent.action.MAIN" />
+32-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:16:17-69
+32-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:16:25-66
+33
+34                <category android:name="android.intent.category.LAUNCHER" />
+34-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:17:17-77
+34-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:17:27-74
+35            </intent-filter>
+36        </activity>
+37
+38        <receiver
+38-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:21:9-28:20
+39            android:name="com.fitflow.NotificationReceiver"
+39-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:22:13-49
+40            android:enabled="true"
+40-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:23:13-35
+41            android:exported="false" >
+41-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:24:13-37
+42            <intent-filter>
+42-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:25:13-27:29
+43                <action android:name="android.intent.action.BOOT_COMPLETED" />
+43-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:26:17-79
+43-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:26:25-76
+44            </intent-filter>
+45        </receiver>
+46
+47        <provider
+47-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:30:9-38:20
+48            android:name="androidx.core.content.FileProvider"
+48-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:31:13-62
+49            android:authorities="com.fitflow.fileprovider"
+49-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:32:13-59
+50            android:exported="false"
+50-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:33:13-37
+51            android:grantUriPermissions="true" >
+51-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:34:13-47
+52            <meta-data
+52-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:35:13-37:54
+53                android:name="android.support.FILE_PROVIDER_PATHS"
+53-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:36:17-67
+54                android:resource="@xml/file_paths" />
+54-->/Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:37:17-51
+55        </provider>
+56
+57        <activity
+57-->[androidx.compose.ui:ui-tooling-android:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/c000ddd5b6afd743992a5049b5759eb7/transformed/jetified-ui-tooling-release/AndroidManifest.xml:23:9-25:39
+58            android:name="androidx.compose.ui.tooling.PreviewActivity"
+58-->[androidx.compose.ui:ui-tooling-android:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/c000ddd5b6afd743992a5049b5759eb7/transformed/jetified-ui-tooling-release/AndroidManifest.xml:24:13-71
+59            android:exported="true" />
+59-->[androidx.compose.ui:ui-tooling-android:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/c000ddd5b6afd743992a5049b5759eb7/transformed/jetified-ui-tooling-release/AndroidManifest.xml:25:13-36
+60        <activity
+60-->[androidx.compose.ui:ui-test-manifest:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/e5228f82cf0fc33e9ca610a384bfbbba/transformed/jetified-ui-test-manifest-1.7.5/AndroidManifest.xml:23:9-25:39
+61            android:name="androidx.activity.ComponentActivity"
+61-->[androidx.compose.ui:ui-test-manifest:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/e5228f82cf0fc33e9ca610a384bfbbba/transformed/jetified-ui-test-manifest-1.7.5/AndroidManifest.xml:24:13-63
+62            android:exported="true" />
+62-->[androidx.compose.ui:ui-test-manifest:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/e5228f82cf0fc33e9ca610a384bfbbba/transformed/jetified-ui-test-manifest-1.7.5/AndroidManifest.xml:25:13-36
+63
+64        <provider
+64-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/gsteele/.gradle/caches/9.0.0/transforms/268f74ffc56352908c95dfebef27a8b7/transformed/jetified-lifecycle-process-2.8.7/AndroidManifest.xml:24:9-32:20
+65            android:name="androidx.startup.InitializationProvider"
+65-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/gsteele/.gradle/caches/9.0.0/transforms/268f74ffc56352908c95dfebef27a8b7/transformed/jetified-lifecycle-process-2.8.7/AndroidManifest.xml:25:13-67
+66            android:authorities="com.fitflow.androidx-startup"
+66-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/gsteele/.gradle/caches/9.0.0/transforms/268f74ffc56352908c95dfebef27a8b7/transformed/jetified-lifecycle-process-2.8.7/AndroidManifest.xml:26:13-68
+67            android:exported="false" >
+67-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/gsteele/.gradle/caches/9.0.0/transforms/268f74ffc56352908c95dfebef27a8b7/transformed/jetified-lifecycle-process-2.8.7/AndroidManifest.xml:27:13-37
+68            <meta-data
+68-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/gsteele/.gradle/caches/9.0.0/transforms/268f74ffc56352908c95dfebef27a8b7/transformed/jetified-lifecycle-process-2.8.7/AndroidManifest.xml:29:13-31:52
+69                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+69-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/gsteele/.gradle/caches/9.0.0/transforms/268f74ffc56352908c95dfebef27a8b7/transformed/jetified-lifecycle-process-2.8.7/AndroidManifest.xml:30:17-78
+70                android:value="androidx.startup" />
+70-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/gsteele/.gradle/caches/9.0.0/transforms/268f74ffc56352908c95dfebef27a8b7/transformed/jetified-lifecycle-process-2.8.7/AndroidManifest.xml:31:17-49
+71            <meta-data
+71-->[androidx.emoji2:emoji2:1.3.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/21deace630c1f4b68a2fe1b27bcb9045/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+72                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+72-->[androidx.emoji2:emoji2:1.3.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/21deace630c1f4b68a2fe1b27bcb9045/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:30:17-75
+73                android:value="androidx.startup" />
+73-->[androidx.emoji2:emoji2:1.3.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/21deace630c1f4b68a2fe1b27bcb9045/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:31:17-49
+74            <meta-data
+74-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+75                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+75-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+76                android:value="androidx.startup" />
+76-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+77        </provider>
+78
+79        <service
+79-->[androidx.room:room-runtime:2.6.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/4f120388a06b4e8122fdc80d51b7ebb4/transformed/room-runtime-2.6.1/AndroidManifest.xml:24:9-28:63
+80            android:name="androidx.room.MultiInstanceInvalidationService"
+80-->[androidx.room:room-runtime:2.6.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/4f120388a06b4e8122fdc80d51b7ebb4/transformed/room-runtime-2.6.1/AndroidManifest.xml:25:13-74
+81            android:directBootAware="true"
+81-->[androidx.room:room-runtime:2.6.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/4f120388a06b4e8122fdc80d51b7ebb4/transformed/room-runtime-2.6.1/AndroidManifest.xml:26:13-43
+82            android:exported="false" />
+82-->[androidx.room:room-runtime:2.6.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/4f120388a06b4e8122fdc80d51b7ebb4/transformed/room-runtime-2.6.1/AndroidManifest.xml:27:13-37
+83
+84        <receiver
+84-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+85            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+85-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+86            android:directBootAware="false"
+86-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+87            android:enabled="true"
+87-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+88            android:exported="true"
+88-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+89            android:permission="android.permission.DUMP" >
+89-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+90            <intent-filter>
+90-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+91                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+91-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+91-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+92            </intent-filter>
+93            <intent-filter>
+93-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+94                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+94-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+94-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+95            </intent-filter>
+96            <intent-filter>
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+97                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+98            </intent-filter>
+99            <intent-filter>
+99-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+100                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+100-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+100-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/gsteele/.gradle/caches/9.0.0/transforms/e526fde0cbcdf3d0c2f4cfd1ef4dc9cf/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+101            </intent-filter>
+102        </receiver>
+103    </application>
+104
+105</manifest>

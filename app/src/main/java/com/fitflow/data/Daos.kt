@@ -44,6 +44,9 @@ interface WorkoutDao {
     @Query("SELECT * FROM history ORDER BY dateTime DESC")
     fun getAllHistory(): Flow<List<HistoryEntry>>
 
+    @Query("SELECT * FROM history WHERE dateTime BETWEEN :start AND :end ORDER BY dateTime DESC")
+    fun getHistoryInRange(start: java.time.LocalDateTime, end: java.time.LocalDateTime): Flow<List<HistoryEntry>>
+
     @Query("""
         SELECT pa.id, pa.planId, pa.activityId, a.name, a.description, pa.dayOfWeek, pa.isActive 
         FROM plan_activities pa 

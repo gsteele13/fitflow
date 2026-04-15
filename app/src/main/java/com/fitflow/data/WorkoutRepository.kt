@@ -35,10 +35,6 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
     fun getHistoryInRange(start: LocalDate, end: LocalDate): Flow<List<HistoryEntry>> {
         val startDateTime = start.atStartOfDay()
         val endDateTime = end.atTime(23, 59, 59)
-        val converters = Converters()
-        return workoutDao.getHistoryInRange(
-            converters.dateToTimestamp(startDateTime)!!,
-            converters.dateToTimestamp(endDateTime)!!
-        )
+        return workoutDao.getHistoryInRange(startDateTime, endDateTime)
     }
 }
