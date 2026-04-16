@@ -23,7 +23,7 @@ https://github.com/gsteele13/fitflow/tree/main/screenshots
 
 ## Installation
 
-You can grab the file here:y
+You can grab the file here:
 
 https://github.com/gsteele13/fitflow/raw/refs/heads/main/app/build/outputs/apk/debug/app-debug.apk
 
