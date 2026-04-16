@@ -10,7 +10,7 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
     val allPlans: Flow<List<Plan>> = workoutDao.getAllPlans()
     val allHistory: Flow<List<HistoryEntry>> = workoutDao.getAllHistory()
 
-    suspend fun insertActivity(activity: Activity) = workoutDao.insertActivity(activity)
+    suspend fun insertActivity(activity: Activity): Long = workoutDao.insertActivity(activity)
     
     suspend fun insertPlan(plan: Plan) = workoutDao.insertPlan(plan)
     
@@ -28,7 +28,14 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
 
     suspend fun getActivityById(id: Long) = workoutDao.getActivityById(id)
 
-    fun getScheduledActivitiesForDay(dayOfWeek: Int) = workoutDao.getScheduledActivitiesForDay(dayOfWeek)
+    fun getScheduledActivitiesForDay(dayOfWeek: Int, startOfDay: LocalDateTime, endOfDay: LocalDateTime) = 
+        workoutDao.getScheduledActivitiesForDay(dayOfWeek, startOfDay, endOfDay)
+
+    suspend fun deletePlan(planId: Long) = workoutDao.deletePlan(planId)
+
+    suspend fun getPlanById(planId: Long) = workoutDao.getPlanById(planId)
+
+    suspend fun getPlanActivitiesByPlanId(planId: Long) = workoutDao.getPlanActivitiesByPlanId(planId)
 
     suspend fun insertHistoryEntry(entry: HistoryEntry) = workoutDao.insertHistoryEntry(entry)
 

@@ -15,6 +15,7 @@ import androidx.room.util.DBUtil;
 import androidx.sqlite.db.SupportSQLiteStatement;
 import java.lang.Class;
 import java.lang.Exception;
+import java.lang.Integer;
 import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
@@ -41,13 +42,15 @@ public final class WorkoutDao_Impl implements WorkoutDao {
 
   private final EntityInsertionAdapter<PlanActivity> __insertionAdapterOfPlanActivity;
 
-  private final EntityInsertionAdapter<HistoryEntry> __insertionAdapterOfHistoryEntry;
-
   private final Converters __converters = new Converters();
+
+  private final EntityInsertionAdapter<HistoryEntry> __insertionAdapterOfHistoryEntry;
 
   private final EntityDeletionOrUpdateAdapter<Plan> __updateAdapterOfPlan;
 
   private final EntityDeletionOrUpdateAdapter<PlanActivity> __updateAdapterOfPlanActivity;
+
+  private final SharedSQLiteStatement __preparedStmtOfDeletePlan;
 
   private final SharedSQLiteStatement __preparedStmtOfDeletePlanActivity;
 
@@ -100,7 +103,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `plan_activities` (`id`,`planId`,`activityId`,`dayOfWeek`,`isActive`) VALUES (nullif(?, 0),?,?,?,?)";
+        return "INSERT OR REPLACE INTO `plan_activities` (`id`,`planId`,`activityId`,`daysOfWeek`,`isActive`) VALUES (nullif(?, 0),?,?,?,?)";
       }
 
       @Override
@@ -109,9 +112,14 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         statement.bindLong(1, entity.getId());
         statement.bindLong(2, entity.getPlanId());
         statement.bindLong(3, entity.getActivityId());
-        statement.bindLong(4, entity.getDayOfWeek());
-        final int _tmp = entity.isActive() ? 1 : 0;
-        statement.bindLong(5, _tmp);
+        final String _tmp = __converters.fromIntList(entity.getDaysOfWeek());
+        if (_tmp == null) {
+          statement.bindNull(4);
+        } else {
+          statement.bindString(4, _tmp);
+        }
+        final int _tmp_1 = entity.isActive() ? 1 : 0;
+        statement.bindLong(5, _tmp_1);
       }
     };
     this.__insertionAdapterOfHistoryEntry = new EntityInsertionAdapter<HistoryEntry>(__db) {
@@ -184,7 +192,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `plan_activities` SET `id` = ?,`planId` = ?,`activityId` = ?,`dayOfWeek` = ?,`isActive` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `plan_activities` SET `id` = ?,`planId` = ?,`activityId` = ?,`daysOfWeek` = ?,`isActive` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -193,10 +201,23 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         statement.bindLong(1, entity.getId());
         statement.bindLong(2, entity.getPlanId());
         statement.bindLong(3, entity.getActivityId());
-        statement.bindLong(4, entity.getDayOfWeek());
-        final int _tmp = entity.isActive() ? 1 : 0;
-        statement.bindLong(5, _tmp);
+        final String _tmp = __converters.fromIntList(entity.getDaysOfWeek());
+        if (_tmp == null) {
+          statement.bindNull(4);
+        } else {
+          statement.bindString(4, _tmp);
+        }
+        final int _tmp_1 = entity.isActive() ? 1 : 0;
+        statement.bindLong(5, _tmp_1);
         statement.bindLong(6, entity.getId());
+      }
+    };
+    this.__preparedStmtOfDeletePlan = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "DELETE FROM plans WHERE id = ?";
+        return _query;
       }
     };
     this.__preparedStmtOfDeletePlanActivity = new SharedSQLiteStatement(__db) {
@@ -210,8 +231,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
-  public Object insertActivity(final Activity activity,
-      final Continuation<? super Long> $completion) {
+  public Object insertActivity(final Activity activity, final Continuation<? super Long> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
       @Override
       @NonNull
@@ -225,11 +245,11 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
-  public Object insertPlan(final Plan plan, final Continuation<? super Long> $completion) {
+  public Object insertPlan(final Plan plan, final Continuation<? super Long> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
       @Override
       @NonNull
@@ -243,12 +263,12 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
   public Object insertPlanActivity(final PlanActivity planActivity,
-      final Continuation<? super Unit> $completion) {
+      final Continuation<? super Unit> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -262,12 +282,12 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
   public Object insertHistoryEntry(final HistoryEntry entry,
-      final Continuation<? super Unit> $completion) {
+      final Continuation<? super Unit> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -281,11 +301,11 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
-  public Object updatePlan(final Plan plan, final Continuation<? super Unit> $completion) {
+  public Object updatePlan(final Plan plan, final Continuation<? super Unit> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -299,12 +319,12 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
   public Object updatePlanActivity(final PlanActivity planActivity,
-      final Continuation<? super Unit> $completion) {
+      final Continuation<? super Unit> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -318,11 +338,36 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
-  public Object deletePlanActivity(final long id, final Continuation<? super Unit> $completion) {
+  public Object deletePlan(final long planId, final Continuation<? super Unit> arg1) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final SupportSQLiteStatement _stmt = __preparedStmtOfDeletePlan.acquire();
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, planId);
+        try {
+          __db.beginTransaction();
+          try {
+            _stmt.executeUpdateDelete();
+            __db.setTransactionSuccessful();
+            return Unit.INSTANCE;
+          } finally {
+            __db.endTransaction();
+          }
+        } finally {
+          __preparedStmtOfDeletePlan.release(_stmt);
+        }
+      }
+    }, arg1);
+  }
+
+  @Override
+  public Object deletePlanActivity(final long id, final Continuation<? super Unit> arg1) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -343,7 +388,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __preparedStmtOfDeletePlanActivity.release(_stmt);
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @Override
@@ -451,7 +496,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
           final int _cursorIndexOfPlanId = CursorUtil.getColumnIndexOrThrow(_cursor, "planId");
           final int _cursorIndexOfActivityId = CursorUtil.getColumnIndexOrThrow(_cursor, "activityId");
-          final int _cursorIndexOfDayOfWeek = CursorUtil.getColumnIndexOrThrow(_cursor, "dayOfWeek");
+          final int _cursorIndexOfDaysOfWeek = CursorUtil.getColumnIndexOrThrow(_cursor, "daysOfWeek");
           final int _cursorIndexOfIsActive = CursorUtil.getColumnIndexOrThrow(_cursor, "isActive");
           final List<PlanActivity> _result = new ArrayList<PlanActivity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
@@ -462,13 +507,19 @@ public final class WorkoutDao_Impl implements WorkoutDao {
             _tmpPlanId = _cursor.getLong(_cursorIndexOfPlanId);
             final long _tmpActivityId;
             _tmpActivityId = _cursor.getLong(_cursorIndexOfActivityId);
-            final int _tmpDayOfWeek;
-            _tmpDayOfWeek = _cursor.getInt(_cursorIndexOfDayOfWeek);
+            final List<Integer> _tmpDaysOfWeek;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfDaysOfWeek)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfDaysOfWeek);
+            }
+            _tmpDaysOfWeek = __converters.toIntList(_tmp);
             final boolean _tmpIsActive;
-            final int _tmp;
-            _tmp = _cursor.getInt(_cursorIndexOfIsActive);
-            _tmpIsActive = _tmp != 0;
-            _item = new PlanActivity(_tmpId,_tmpPlanId,_tmpActivityId,_tmpDayOfWeek,_tmpIsActive);
+            final int _tmp_1;
+            _tmp_1 = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp_1 != 0;
+            _item = new PlanActivity(_tmpId,_tmpPlanId,_tmpActivityId,_tmpDaysOfWeek,_tmpIsActive);
             _result.add(_item);
           }
           return _result;
@@ -485,19 +536,39 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
-  public Flow<List<Activity>> getScheduledActivitiesForDay(final int dayOfWeek) {
+  public Flow<List<Activity>> getScheduledActivitiesForDay(final int dayOfWeek,
+      final LocalDateTime startOfDay, final LocalDateTime endOfDay) {
     final String _sql = "\n"
-            + "        SELECT a.*, pa.dayOfWeek, pa.isActive as paIsActive, p.isActive as pIsActive \n"
+            + "        SELECT a.* \n"
             + "        FROM activities a \n"
             + "        JOIN plan_activities pa ON a.id = pa.activityId \n"
             + "        JOIN plans p ON pa.planId = p.id \n"
-            + "        WHERE pa.dayOfWeek = ? AND pa.isActive = 1 AND p.isActive = 1\n"
+            + "        WHERE pa.daysOfWeek LIKE '%' || ? || '%' AND pa.isActive = 1 AND p.isActive = 1\n"
+            + "        AND a.name NOT IN (\n"
+            + "            SELECT h.name FROM history h \n"
+            + "            WHERE h.status IN ('COMPLETED', 'SKIPPED') \n"
+            + "            AND h.dateTime BETWEEN ? AND ?\n"
+            + "        )\n"
             + "    ";
-    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 3);
     int _argIndex = 1;
     _statement.bindLong(_argIndex, dayOfWeek);
+    _argIndex = 2;
+    final Long _tmp = __converters.dateToTimestamp(startOfDay);
+    if (_tmp == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp);
+    }
+    _argIndex = 3;
+    final Long _tmp_1 = __converters.dateToTimestamp(endOfDay);
+    if (_tmp_1 == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp_1);
+    }
     return CoroutinesRoom.createFlow(__db, false, new String[] {"activities", "plan_activities",
-        "plans"}, new Callable<List<Activity>>() {
+        "plans", "history"}, new Callable<List<Activity>>() {
       @Override
       @NonNull
       public List<Activity> call() throws Exception {
@@ -537,6 +608,101 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         _statement.release();
       }
     });
+  }
+
+  @Override
+  public Object getPlanById(final long planId, final Continuation<? super Plan> arg1) {
+    final String _sql = "SELECT * FROM plans WHERE id = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, planId);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<Plan>() {
+      @Override
+      @Nullable
+      public Plan call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfIsActive = CursorUtil.getColumnIndexOrThrow(_cursor, "isActive");
+          final Plan _result;
+          if (_cursor.moveToFirst()) {
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final boolean _tmpIsActive;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp != 0;
+            _result = new Plan(_tmpId,_tmpName,_tmpIsActive);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, arg1);
+  }
+
+  @Override
+  public Object getPlanActivitiesByPlanId(final long planId,
+      final Continuation<? super List<PlanActivity>> arg1) {
+    final String _sql = "SELECT * FROM plan_activities WHERE planId = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, planId);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<List<PlanActivity>>() {
+      @Override
+      @NonNull
+      public List<PlanActivity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfPlanId = CursorUtil.getColumnIndexOrThrow(_cursor, "planId");
+          final int _cursorIndexOfActivityId = CursorUtil.getColumnIndexOrThrow(_cursor, "activityId");
+          final int _cursorIndexOfDaysOfWeek = CursorUtil.getColumnIndexOrThrow(_cursor, "daysOfWeek");
+          final int _cursorIndexOfIsActive = CursorUtil.getColumnIndexOrThrow(_cursor, "isActive");
+          final List<PlanActivity> _result = new ArrayList<PlanActivity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final PlanActivity _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final long _tmpPlanId;
+            _tmpPlanId = _cursor.getLong(_cursorIndexOfPlanId);
+            final long _tmpActivityId;
+            _tmpActivityId = _cursor.getLong(_cursorIndexOfActivityId);
+            final List<Integer> _tmpDaysOfWeek;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfDaysOfWeek)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfDaysOfWeek);
+            }
+            _tmpDaysOfWeek = __converters.toIntList(_tmp);
+            final boolean _tmpIsActive;
+            final int _tmp_1;
+            _tmp_1 = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp_1 != 0;
+            _item = new PlanActivity(_tmpId,_tmpPlanId,_tmpActivityId,_tmpDaysOfWeek,_tmpIsActive);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, arg1);
   }
 
   @Override
@@ -713,7 +879,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   @Override
   public Flow<List<PlanActivityWithDetails>> getPlanActivitiesWithDetails(final long planId) {
     final String _sql = "\n"
-            + "        SELECT pa.id, pa.planId, pa.activityId, a.name, a.description, pa.dayOfWeek, pa.isActive \n"
+            + "        SELECT pa.id, pa.planId, pa.activityId, a.name, a.description, pa.daysOfWeek, pa.isActive\n"
             + "        FROM plan_activities pa \n"
             + "        JOIN activities a ON pa.activityId = a.id \n"
             + "        WHERE pa.planId = ?\n"
@@ -733,7 +899,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           final int _cursorIndexOfActivityId = 2;
           final int _cursorIndexOfName = 3;
           final int _cursorIndexOfDescription = 4;
-          final int _cursorIndexOfDayOfWeek = 5;
+          final int _cursorIndexOfDaysOfWeek = 5;
           final int _cursorIndexOfIsActive = 6;
           final List<PlanActivityWithDetails> _result = new ArrayList<PlanActivityWithDetails>(_cursor.getCount());
           while (_cursor.moveToNext()) {
@@ -756,13 +922,19 @@ public final class WorkoutDao_Impl implements WorkoutDao {
             } else {
               _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
             }
-            final int _tmpDayOfWeek;
-            _tmpDayOfWeek = _cursor.getInt(_cursorIndexOfDayOfWeek);
+            final List<Integer> _tmpDaysOfWeek;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfDaysOfWeek)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfDaysOfWeek);
+            }
+            _tmpDaysOfWeek = __converters.toIntList(_tmp);
             final boolean _tmpIsActive;
-            final int _tmp;
-            _tmp = _cursor.getInt(_cursorIndexOfIsActive);
-            _tmpIsActive = _tmp != 0;
-            _item = new PlanActivityWithDetails(_tmpId,_tmpPlanId,_tmpActivityId,_tmpName,_tmpDescription,_tmpDayOfWeek,_tmpIsActive);
+            final int _tmp_1;
+            _tmp_1 = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp_1 != 0;
+            _item = new PlanActivityWithDetails(_tmpId,_tmpPlanId,_tmpActivityId,_tmpName,_tmpDescription,_tmpDaysOfWeek,_tmpIsActive);
             _result.add(_item);
           }
           return _result;
@@ -779,7 +951,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
-  public Object getActivityById(final long id, final Continuation<? super Activity> $completion) {
+  public Object getActivityById(final long id, final Continuation<? super Activity> arg1) {
     final String _sql = "SELECT * FROM activities WHERE id = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
@@ -820,7 +992,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           _statement.release();
         }
       }
-    }, $completion);
+    }, arg1);
   }
 
   @NonNull

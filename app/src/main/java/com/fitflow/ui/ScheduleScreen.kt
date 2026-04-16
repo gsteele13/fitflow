@@ -47,19 +47,30 @@ fun ScheduleScreen(viewModel: WorkoutViewModel = viewModel()) {
     }
 
     if (showAddDialog) {
+        val allActivities by viewModel.allActivities.collectAsState(initial = emptyList())
+        val selectedDate = startOfWeek.plusDays(pagerState.currentPage.toLong())
         AddActivityOrNoteDialog(
             onDismiss = { showAddDialog = false },
             onAddNote = { note -> 
-                viewModel.addNote(note)
+                viewModel.addNote(note, selectedDate)
                 showAddDialog = false
-            }
+            },
+            onAddUnscheduled = { name, desc ->
+                viewModel.addUnscheduledActivity(name, desc, selectedDate, "")
+                showAddDialog = false
+            },
+            onAddFromPlan = { activity ->
+                viewModel.addUnscheduledActivity(activity.name, activity.description, selectedDate, "")
+                showAddDialog = false
+            },
+            availableActivities = allActivities
         )
     }
 }
 
 @Composable
 fun DaySchedule(date: LocalDate, viewModel: WorkoutViewModel) {
-    val activities by viewModel.getScheduledActivitiesForDay(date.dayOfWeek.value).collectAsState(initial = emptyList())
+    val activities by viewModel.getScheduledActivitiesForDay(date).collectAsState(initial = emptyList())
     
     var selectedActivity by remember { mutableStateOf<Activity?>(null) }
     var showOptionsDialog by remember { mutableStateOf(false) }
@@ -91,11 +102,11 @@ fun DaySchedule(date: LocalDate, viewModel: WorkoutViewModel) {
             activity = selectedActivity!!,
             onDismiss = { showOptionsDialog = false },
             onDone = { notes ->
-                viewModel.markAsDone(selectedActivity!!, notes)
+                viewModel.markAsDone(selectedActivity!!, date, notes)
                 showOptionsDialog = false
             },
             onSkip = {
-                viewModel.skipActivity(selectedActivity!!)
+                viewModel.skipActivity(selectedActivity!!, date)
                 showOptionsDialog = false
             },
             onSnooze = { /* Handle snooze */
@@ -165,46 +176,94 @@ fun ActivityOptionsDialog(
 }
 
 @Composable
-fun AddActivityOrNoteDialog(onDismiss: () -> Unit, onAddNote: (String) -> Unit) {
-    var showNoteInput by remember { mutableStateOf(false) }
-    var noteText by remember { mutableStateOf("") }
+fun AddActivityOrNoteDialog(
+    onDismiss: () -> Unit,
+    onAddNote: (String) -> Unit,
+    onAddUnscheduled: (String, String) -> Unit,
+    onAddFromPlan: (Activity) -> Unit,
+    availableActivities: List<Activity>
+) {
+    var dialogMode by remember { mutableStateOf("MENU") } // MENU, NOTE, UNSCHEDULED, FROM_PLAN
+    var text1 by remember { mutableStateOf("") }
+    var text2 by remember { mutableStateOf("") }
 
-    if (!showNoteInput) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Add Item") },
-            text = {
-                Column {
-                    Button(onClick = { /* Add unscheduled activity */ }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Add Unscheduled Activity")
+    when (dialogMode) {
+        "MENU" -> {
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text("Add Item") },
+                text = {
+                    Column {
+                        Button(onClick = { dialogMode = "UNSCHEDULED" }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Add Unscheduled Activity")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = { dialogMode = "FROM_PLAN" }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Add from Plan")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = { dialogMode = "NOTE" }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Add Note")
+                        }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { /* Add from plan */ }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Add from Plan")
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { showNoteInput = true }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Add Note")
-                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = onDismiss) { Text("Cancel") }
                 }
-            },
-            confirmButton = {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
-            }
-        )
-    } else {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Add Note") },
-            text = {
-                TextField(value = noteText, onValueChange = { noteText = it }, placeholder = { Text("Enter your note here...") })
-            },
-            confirmButton = {
-                TextButton(onClick = { onAddNote(noteText) }) { Text("Add") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showNoteInput = false }) { Text("Back") }
-            }
-        )
+            )
+        }
+        "NOTE" -> {
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text("Add Note") },
+                text = {
+                    TextField(value = text1, onValueChange = { text1 = it }, placeholder = { Text("Enter your note here...") })
+                },
+                confirmButton = {
+                    TextButton(onClick = { onAddNote(text1) }) { Text("Add") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { dialogMode = "MENU" }) { Text("Back") }
+                }
+            )
+        }
+        "UNSCHEDULED" -> {
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text("Unscheduled Activity") },
+                text = {
+                    Column {
+                        TextField(value = text1, onValueChange = { text1 = it }, placeholder = { Text("Activity Name") })
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TextField(value = text2, onValueChange = { text2 = it }, placeholder = { Text("Description") })
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { onAddUnscheduled(text1, text2) }) { Text("Add") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { dialogMode = "MENU" }) { Text("Back") }
+                }
+            )
+        }
+        "FROM_PLAN" -> {
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text("Choose Activity") },
+                text = {
+                    LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
+                        items(availableActivities) { activity ->
+                            ListItem(
+                                headlineContent = { Text(activity.name) },
+                                modifier = Modifier.clickable { onAddFromPlan(activity) }
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { dialogMode = "MENU" }) { Text("Back") }
+                }
+            )
+        }
     }
 }

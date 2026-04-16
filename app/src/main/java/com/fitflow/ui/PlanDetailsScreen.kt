@@ -1,5 +1,6 @@
 package com.fitflow.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +24,7 @@ import java.util.*
 fun PlanDetailsScreen(planId: Long, onBack: () -> Unit, viewModel: WorkoutViewModel = viewModel()) {
     val activities by viewModel.getPlanActivities(planId).collectAsState(initial = emptyList())
     var showAddActivityDialog by remember { mutableStateOf(false) }
+    var activityToEdit by remember { mutableStateOf<PlanActivityWithDetails?>(null) }
 
     Scaffold(
         topBar = {
@@ -52,7 +54,8 @@ fun PlanDetailsScreen(planId: Long, onBack: () -> Unit, viewModel: WorkoutViewMo
                         PlanActivityItem(
                             activity = activity,
                             onToggle = { viewModel.toggleActivityInPlanActive(activity) },
-                            onDelete = { viewModel.deleteActivityFromPlan(activity.id) }
+                            onDelete = { viewModel.deleteActivityFromPlan(activity.id) },
+                            onClick = { activityToEdit = activity }
                         )
                     }
                 }
@@ -61,11 +64,35 @@ fun PlanDetailsScreen(planId: Long, onBack: () -> Unit, viewModel: WorkoutViewMo
     }
 
     if (showAddActivityDialog) {
-        AddActivityToPlanDialog(
+        ActivityDialog(
             onDismiss = { showAddActivityDialog = false },
-            onAdd = { name, desc, day ->
-                viewModel.addActivityToPlan(planId, name, desc, day)
+            onConfirm = { name, desc, days ->
+                viewModel.addActivityToPlan(planId, name, desc, days)
                 showAddActivityDialog = false
+            }
+        )
+    }
+
+    if (activityToEdit != null) {
+        val activity = activityToEdit!!
+        ActivityDialog(
+            initialName = activity.name,
+            initialDescription = activity.description,
+            initialDays = activity.daysOfWeek,
+            title = "Edit Activity",
+            confirmLabel = "Save",
+            onDismiss = { activityToEdit = null },
+            onConfirm = { name, desc, days ->
+                viewModel.updateActivityInPlan(
+                    planActivityId = activity.id,
+                    activityId = activity.activityId,
+                    planId = activity.planId,
+                    name = name,
+                    description = desc,
+                    daysOfWeek = days,
+                    isActive = activity.isActive
+                )
+                activityToEdit = null
             }
         )
     }
@@ -75,12 +102,14 @@ fun PlanDetailsScreen(planId: Long, onBack: () -> Unit, viewModel: WorkoutViewMo
 fun PlanActivityItem(
     activity: PlanActivityWithDetails,
     onToggle: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
@@ -91,8 +120,11 @@ fun PlanActivityItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = activity.name, style = MaterialTheme.typography.titleLarge)
+                val daysString = activity.daysOfWeek.sorted().joinToString(", ") {
+                    DayOfWeek.of(it).getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                }
                 Text(
-                    text = DayOfWeek.of(activity.dayOfWeek).getDisplayName(TextStyle.FULL, Locale.getDefault()),
+                    text = daysString,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 if (activity.description.isNotEmpty()) {
@@ -113,29 +145,48 @@ fun PlanActivityItem(
 }
 
 @Composable
-fun AddActivityToPlanDialog(onDismiss: () -> Unit, onAdd: (String, String, Int) -> Unit) {
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedDay by remember { mutableStateOf(1) } // Default to Monday
+fun ActivityDialog(
+    initialName: String = "",
+    initialDescription: String = "",
+    initialDays: List<Int> = emptyList(),
+    title: String = "Add Activity",
+    confirmLabel: String = "Add",
+    onDismiss: () -> Unit,
+    onConfirm: (String, String, List<Int>) -> Unit
+) {
+    var name by remember { mutableStateOf(initialName) }
+    var description by remember { mutableStateOf(initialDescription) }
+    val selectedDays = remember { mutableStateListOf<Int>().apply { addAll(initialDays) } }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Activity") },
+        title = { Text(title) },
         text = {
             Column {
                 TextField(value = name, onValueChange = { name = it }, label = { Text("Activity Name") })
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(value = description, onValueChange = { description = it }, label = { Text("Description") })
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Select Day:")
+                Text("Select Days:")
                 
-                // Simplified day selection
                 (1..7).forEach { day ->
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            if (selectedDays.contains(day)) selectedDays.remove(day)
+                            else selectedDays.add(day)
+                        },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        RadioButton(selected = selectedDay == day, onClick = { selectedDay = day })
+                        Checkbox(
+                            checked = selectedDays.contains(day),
+                            onCheckedChange = {
+                                if (it) {
+                                    if (!selectedDays.contains(day)) selectedDays.add(day)
+                                } else {
+                                    selectedDays.remove(day)
+                                }
+                            }
+                        )
                         Text(
                             text = DayOfWeek.of(day).getDisplayName(TextStyle.FULL, Locale.getDefault()),
                             modifier = Modifier.padding(start = 8.dp)
@@ -145,7 +196,7 @@ fun AddActivityToPlanDialog(onDismiss: () -> Unit, onAdd: (String, String, Int) 
             }
         },
         confirmButton = {
-            TextButton(onClick = { if (name.isNotBlank()) onAdd(name, description, selectedDay) }) { Text("Add") }
+            TextButton(onClick = { if (name.isNotBlank() && selectedDays.isNotEmpty()) onConfirm(name, description, selectedDays.toList()) }) { Text(confirmLabel) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel") }

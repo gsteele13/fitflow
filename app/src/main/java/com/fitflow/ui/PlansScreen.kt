@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +36,9 @@ fun PlansScreen(onPlanClick: (Long) -> Unit, viewModel: WorkoutViewModel = viewM
                     PlanItem(
                         plan = plan, 
                         onToggle = { viewModel.togglePlanActive(plan) },
-                        onClick = { onPlanClick(plan.id) }
+                        onClick = { onPlanClick(plan.id) },
+                        onDelete = { viewModel.deletePlan(plan.id) },
+                        onDuplicate = { viewModel.duplicatePlan(plan.id) }
                     )
                 }
             }
@@ -54,7 +57,15 @@ fun PlansScreen(onPlanClick: (Long) -> Unit, viewModel: WorkoutViewModel = viewM
 }
 
 @Composable
-fun PlanItem(plan: Plan, onToggle: () -> Unit, onClick: () -> Unit) {
+fun PlanItem(
+    plan: Plan, 
+    onToggle: () -> Unit, 
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    onDuplicate: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,13 +79,39 @@ fun PlanItem(plan: Plan, onToggle: () -> Unit, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(text = plan.name, style = MaterialTheme.typography.titleLarge)
             }
-            Switch(
-                checked = plan.isActive,
-                onCheckedChange = { onToggle() }
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(
+                    checked = plan.isActive,
+                    onCheckedChange = { onToggle() }
+                )
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "Options")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Duplicate") },
+                            onClick = {
+                                onDuplicate()
+                                showMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                onDelete()
+                                showMenu = false
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -93,7 +130,7 @@ fun CreatePlanDialog(onDismiss: () -> Unit, onCreate: (String) -> Unit) {
             )
         },
         confirmButton = {
-            TextButton(onClick = { onCreate(planName) }) { Text("Create") }
+            TextButton(onClick = { if (planName.isNotBlank()) onCreate(planName) }) { Text("Create") }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel") }

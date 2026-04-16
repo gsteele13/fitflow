@@ -23,7 +23,7 @@ data class PlanActivity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val planId: Long,
     val activityId: Long,
-    val dayOfWeek: Int, // 1 (Monday) to 7 (Sunday)
+    val daysOfWeek: List<Int>, // e.g. [1, 3, 5]
     val isActive: Boolean = true
 )
 
@@ -48,6 +48,6 @@ data class PlanActivityWithDetails(
     val activityId: Long,
     val name: String,
     val description: String,
-    val dayOfWeek: Int,
+    val daysOfWeek: List<Int>,
     val isActive: Boolean
 )

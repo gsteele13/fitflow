@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,6 +37,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    var showAboutDialog by remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -65,9 +67,28 @@ fun MainScreen() {
                         scope.launch { drawerState.close() }
                     }
                 )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                NavigationDrawerItem(
+                    label = { Text("About build") },
+                    selected = false,
+                    onClick = {
+                        showAboutDialog = true
+                        scope.launch { drawerState.close() }
+                    }
+                )
             }
         }
     ) {
+        if (showAboutDialog) {
+            AlertDialog(
+                onDismissRequest = { showAboutDialog = false },
+                title = { Text("About Build") },
+                text = { Text("Build Timestamp: ${BuildConfig.BUILD_TIME}") },
+                confirmButton = {
+                    TextButton(onClick = { showAboutDialog = false }) { Text("OK") }
+                }
+            )
+        }
         Scaffold(
             topBar = {
                 TopAppBar(

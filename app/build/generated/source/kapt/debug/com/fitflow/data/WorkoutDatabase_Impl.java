@@ -31,15 +31,15 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(1) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `activities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `plans` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `isActive` INTEGER NOT NULL)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS `plan_activities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `planId` INTEGER NOT NULL, `activityId` INTEGER NOT NULL, `dayOfWeek` INTEGER NOT NULL, `isActive` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `plan_activities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `planId` INTEGER NOT NULL, `activityId` INTEGER NOT NULL, `daysOfWeek` TEXT NOT NULL, `isActive` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `history` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dateTime` INTEGER NOT NULL, `type` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `notes` TEXT NOT NULL, `status` TEXT NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6de048e26a8e85a66ef65ae31d505f5c')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7e4a0544a56c045d60a8b93a3d149d4')");
       }
 
       @Override
@@ -121,7 +121,7 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
         _columnsPlanActivities.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsPlanActivities.put("planId", new TableInfo.Column("planId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsPlanActivities.put("activityId", new TableInfo.Column("activityId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsPlanActivities.put("dayOfWeek", new TableInfo.Column("dayOfWeek", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanActivities.put("daysOfWeek", new TableInfo.Column("daysOfWeek", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsPlanActivities.put("isActive", new TableInfo.Column("isActive", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysPlanActivities = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesPlanActivities = new HashSet<TableInfo.Index>(0);
@@ -151,7 +151,7 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "6de048e26a8e85a66ef65ae31d505f5c", "0cd4da8bb0f78ed5613241e77e2249c3");
+    }, "b7e4a0544a56c045d60a8b93a3d149d4", "5856987daa2a7cd654b4a13a7d0040da");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

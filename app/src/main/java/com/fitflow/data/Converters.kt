@@ -25,4 +25,14 @@ class Converters {
     fun toStatus(value: String): HistoryStatus {
         return HistoryStatus.valueOf(value)
     }
+
+    @TypeConverter
+    fun fromIntList(value: List<Int>?): String? {
+        return value?.joinToString(",")
+    }
+
+    @TypeConverter
+    fun toIntList(value: String?): List<Int>? {
+        return value?.split(",")?.filter { it.isNotEmpty() }?.map { it.toInt() }
+    }
 }

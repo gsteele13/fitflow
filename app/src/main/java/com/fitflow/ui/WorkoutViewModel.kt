@@ -23,14 +23,17 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         allHistory = repository.allHistory
     }
 
-    fun getScheduledActivitiesForDay(dayOfWeek: Int): Flow<List<Activity>> {
-        return repository.getScheduledActivitiesForDay(dayOfWeek)
+    fun getScheduledActivitiesForDay(date: LocalDate): Flow<List<Activity>> {
+        val dayOfWeek = date.dayOfWeek.value
+        val startOfDay = date.atStartOfDay()
+        val endOfDay = date.atTime(23, 59, 59)
+        return repository.getScheduledActivitiesForDay(dayOfWeek, startOfDay, endOfDay)
     }
 
-    fun markAsDone(activity: Activity, notes: String) {
+    fun markAsDone(activity: Activity, date: LocalDate, notes: String) {
         viewModelScope.launch {
             val entry = HistoryEntry(
-                dateTime = LocalDateTime.now(),
+                dateTime = if (date == LocalDate.now()) LocalDateTime.now() else date.atTime(12, 0),
                 type = "ACTIVITY",
                 name = activity.name,
                 description = activity.description,
@@ -41,10 +44,10 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun skipActivity(activity: Activity) {
+    fun skipActivity(activity: Activity, date: LocalDate) {
         viewModelScope.launch {
             val entry = HistoryEntry(
-                dateTime = LocalDateTime.now(),
+                dateTime = if (date == LocalDate.now()) LocalDateTime.now() else date.atTime(12, 0),
                 type = "ACTIVITY",
                 name = activity.name,
                 description = activity.description,
@@ -54,10 +57,10 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun addNote(note: String) {
+    fun addNote(note: String, date: LocalDate) {
         viewModelScope.launch {
             val entry = HistoryEntry(
-                dateTime = LocalDateTime.now(),
+                dateTime = if (date == LocalDate.now()) LocalDateTime.now() else date.atTime(12, 0),
                 type = "NOTE",
                 name = "Note",
                 description = "",
@@ -74,6 +77,23 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun deletePlan(planId: Long) {
+        viewModelScope.launch {
+            repository.deletePlan(planId)
+        }
+    }
+
+    fun duplicatePlan(planId: Long) {
+        viewModelScope.launch {
+            val oldPlan = repository.getPlanById(planId) ?: return@launch
+            val newPlanId = repository.insertPlan(Plan(name = "${oldPlan.name} (Copy)"))
+            val activities = repository.getPlanActivitiesByPlanId(planId)
+            activities.forEach { activity ->
+                repository.insertPlanActivity(activity.copy(id = 0, planId = newPlanId))
+            }
+        }
+    }
+
     fun togglePlanActive(plan: Plan) {
         viewModelScope.launch {
             repository.updatePlan(plan.copy(isActive = !plan.isActive))
@@ -84,22 +104,53 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         return repository.getPlanActivitiesWithDetails(planId)
     }
 
-    fun addActivityToPlan(planId: Long, name: String, description: String, dayOfWeek: Int) {
+    fun addActivityToPlan(planId: Long, name: String, description: String, daysOfWeek: List<Int>) {
         viewModelScope.launch {
             val activityId = repository.insertActivity(Activity(name = name, description = description))
-            repository.insertPlanActivity(PlanActivity(planId = planId, activityId = activityId, dayOfWeek = dayOfWeek))
+            repository.insertPlanActivity(
+                PlanActivity(
+                    planId = planId,
+                    activityId = activityId,
+                    daysOfWeek = daysOfWeek
+                )
+            )
+        }
+    }
+
+    fun updateActivityInPlan(
+        planActivityId: Long,
+        activityId: Long,
+        planId: Long,
+        name: String,
+        description: String,
+        daysOfWeek: List<Int>,
+        isActive: Boolean
+    ) {
+        viewModelScope.launch {
+            repository.insertActivity(Activity(id = activityId, name = name, description = description))
+            repository.updatePlanActivity(
+                PlanActivity(
+                    id = planActivityId,
+                    planId = planId,
+                    activityId = activityId,
+                    daysOfWeek = daysOfWeek,
+                    isActive = isActive
+                )
+            )
         }
     }
 
     fun toggleActivityInPlanActive(activity: PlanActivityWithDetails) {
         viewModelScope.launch {
-            repository.updatePlanActivity(PlanActivity(
-                id = activity.id,
-                planId = activity.planId,
-                activityId = activity.activityId,
-                dayOfWeek = activity.dayOfWeek,
-                isActive = !activity.isActive
-            ))
+            repository.updatePlanActivity(
+                PlanActivity(
+                    id = activity.id,
+                    planId = activity.planId,
+                    activityId = activity.activityId,
+                    daysOfWeek = activity.daysOfWeek,
+                    isActive = !activity.isActive
+                )
+            )
         }
     }
 
@@ -109,13 +160,19 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         }
     }
     
-    fun addUnscheduledActivity(name: String, description: String) {
+    val allActivities: Flow<List<Activity>> = repository.allActivities
+
+    fun addUnscheduledActivity(name: String, description: String, date: LocalDate, notes: String) {
         viewModelScope.launch {
-            // Unscheduled means just adding to history directly as completed or maybe just a one-off?
-            // User said "add an unscheduled activity... individual one... or one from plans"
-            // If it's unscheduled, maybe it just appears in today's list or goes straight to history.
-            // Let's assume it adds to today's "temporary" list if we had one, 
-            // but for now let's just create a history entry if they perform it.
+            val entry = HistoryEntry(
+                dateTime = if (date == LocalDate.now()) LocalDateTime.now() else date.atTime(12, 0),
+                type = "ACTIVITY",
+                name = name,
+                description = description,
+                notes = notes,
+                status = HistoryStatus.COMPLETED
+            )
+            repository.insertHistoryEntry(entry)
         }
     }
 }

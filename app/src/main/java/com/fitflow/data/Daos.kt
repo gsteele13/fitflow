@@ -2,6 +2,7 @@ package com.fitflow.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 @Dao
 interface WorkoutDao {
@@ -30,13 +31,27 @@ interface WorkoutDao {
     suspend fun updatePlanActivity(planActivity: PlanActivity)
 
     @Query("""
-        SELECT a.*, pa.dayOfWeek, pa.isActive as paIsActive, p.isActive as pIsActive 
+        SELECT a.* 
         FROM activities a 
         JOIN plan_activities pa ON a.id = pa.activityId 
         JOIN plans p ON pa.planId = p.id 
-        WHERE pa.dayOfWeek = :dayOfWeek AND pa.isActive = 1 AND p.isActive = 1
+        WHERE pa.daysOfWeek LIKE '%' || :dayOfWeek || '%' AND pa.isActive = 1 AND p.isActive = 1
+        AND a.name NOT IN (
+            SELECT h.name FROM history h 
+            WHERE h.status IN ('COMPLETED', 'SKIPPED') 
+            AND h.dateTime BETWEEN :startOfDay AND :endOfDay
+        )
     """)
-    fun getScheduledActivitiesForDay(dayOfWeek: Int): Flow<List<Activity>>
+    fun getScheduledActivitiesForDay(dayOfWeek: Int, startOfDay: LocalDateTime, endOfDay: LocalDateTime): Flow<List<Activity>>
+
+    @Query("DELETE FROM plans WHERE id = :planId")
+    suspend fun deletePlan(planId: Long)
+
+    @Query("SELECT * FROM plans WHERE id = :planId")
+    suspend fun getPlanById(planId: Long): Plan?
+
+    @Query("SELECT * FROM plan_activities WHERE planId = :planId")
+    suspend fun getPlanActivitiesByPlanId(planId: Long): List<PlanActivity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHistoryEntry(entry: HistoryEntry)
@@ -48,7 +63,7 @@ interface WorkoutDao {
     fun getHistoryInRange(start: java.time.LocalDateTime, end: java.time.LocalDateTime): Flow<List<HistoryEntry>>
 
     @Query("""
-        SELECT pa.id, pa.planId, pa.activityId, a.name, a.description, pa.dayOfWeek, pa.isActive 
+        SELECT pa.id, pa.planId, pa.activityId, a.name, a.description, pa.daysOfWeek, pa.isActive
         FROM plan_activities pa 
         JOIN activities a ON pa.activityId = a.id 
         WHERE pa.planId = :planId
