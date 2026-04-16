@@ -17,6 +17,11 @@ be activated or deactivated.
 
 That's pretty much the idea
 
+Here are some screenshots: 
+
+<img src="screenshosts/Screenshot_20260416_221912.jpg">
+
+
 ## Installation
 
 You can grab the file here:y
