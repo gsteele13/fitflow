@@ -175,4 +175,22 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
             repository.insertHistoryEntry(entry)
         }
     }
+
+    fun updateHistoryEntry(entry: HistoryEntry) {
+        viewModelScope.launch {
+            repository.updateHistoryEntry(entry)
+        }
+    }
+
+    fun deleteHistoryEntry(entry: HistoryEntry) {
+        viewModelScope.launch {
+            repository.deleteHistoryEntry(entry)
+        }
+    }
+
+    fun deleteHistoryEntries(ids: List<Long>) {
+        viewModelScope.launch {
+            repository.deleteHistoryEntries(ids)
+        }
+    }
 }

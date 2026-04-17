@@ -39,6 +39,12 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
 
     suspend fun insertHistoryEntry(entry: HistoryEntry) = workoutDao.insertHistoryEntry(entry)
 
+    suspend fun updateHistoryEntry(entry: HistoryEntry) = workoutDao.updateHistoryEntry(entry)
+
+    suspend fun deleteHistoryEntry(entry: HistoryEntry) = workoutDao.deleteHistoryEntry(entry)
+
+    suspend fun deleteHistoryEntries(ids: List<Long>) = workoutDao.deleteHistoryEntries(ids)
+
     fun getHistoryInRange(start: LocalDate, end: LocalDate): Flow<List<HistoryEntry>> {
         val startDateTime = start.atStartOfDay()
         val endDateTime = end.atTime(23, 59, 59)

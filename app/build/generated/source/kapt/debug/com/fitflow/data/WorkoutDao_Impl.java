@@ -12,6 +12,7 @@ import androidx.room.RoomSQLiteQuery;
 import androidx.room.SharedSQLiteStatement;
 import androidx.room.util.CursorUtil;
 import androidx.room.util.DBUtil;
+import androidx.room.util.StringUtil;
 import androidx.sqlite.db.SupportSQLiteStatement;
 import java.lang.Class;
 import java.lang.Exception;
@@ -20,6 +21,7 @@ import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,9 +48,13 @@ public final class WorkoutDao_Impl implements WorkoutDao {
 
   private final EntityInsertionAdapter<HistoryEntry> __insertionAdapterOfHistoryEntry;
 
+  private final EntityDeletionOrUpdateAdapter<HistoryEntry> __deletionAdapterOfHistoryEntry;
+
   private final EntityDeletionOrUpdateAdapter<Plan> __updateAdapterOfPlan;
 
   private final EntityDeletionOrUpdateAdapter<PlanActivity> __updateAdapterOfPlanActivity;
+
+  private final EntityDeletionOrUpdateAdapter<HistoryEntry> __updateAdapterOfHistoryEntry;
 
   private final SharedSQLiteStatement __preparedStmtOfDeletePlan;
 
@@ -167,6 +173,19 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         }
       }
     };
+    this.__deletionAdapterOfHistoryEntry = new EntityDeletionOrUpdateAdapter<HistoryEntry>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "DELETE FROM `history` WHERE `id` = ?";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final HistoryEntry entity) {
+        statement.bindLong(1, entity.getId());
+      }
+    };
     this.__updateAdapterOfPlan = new EntityDeletionOrUpdateAdapter<Plan>(__db) {
       @Override
       @NonNull
@@ -212,6 +231,52 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         statement.bindLong(6, entity.getId());
       }
     };
+    this.__updateAdapterOfHistoryEntry = new EntityDeletionOrUpdateAdapter<HistoryEntry>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "UPDATE OR ABORT `history` SET `id` = ?,`dateTime` = ?,`type` = ?,`name` = ?,`description` = ?,`notes` = ?,`status` = ? WHERE `id` = ?";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final HistoryEntry entity) {
+        statement.bindLong(1, entity.getId());
+        final Long _tmp = __converters.dateToTimestamp(entity.getDateTime());
+        if (_tmp == null) {
+          statement.bindNull(2);
+        } else {
+          statement.bindLong(2, _tmp);
+        }
+        if (entity.getType() == null) {
+          statement.bindNull(3);
+        } else {
+          statement.bindString(3, entity.getType());
+        }
+        if (entity.getName() == null) {
+          statement.bindNull(4);
+        } else {
+          statement.bindString(4, entity.getName());
+        }
+        if (entity.getDescription() == null) {
+          statement.bindNull(5);
+        } else {
+          statement.bindString(5, entity.getDescription());
+        }
+        if (entity.getNotes() == null) {
+          statement.bindNull(6);
+        } else {
+          statement.bindString(6, entity.getNotes());
+        }
+        final String _tmp_1 = __converters.fromStatus(entity.getStatus());
+        if (_tmp_1 == null) {
+          statement.bindNull(7);
+        } else {
+          statement.bindString(7, _tmp_1);
+        }
+        statement.bindLong(8, entity.getId());
+      }
+    };
     this.__preparedStmtOfDeletePlan = new SharedSQLiteStatement(__db) {
       @Override
       @NonNull
@@ -231,7 +296,8 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
-  public Object insertActivity(final Activity activity, final Continuation<? super Long> arg1) {
+  public Object insertActivity(final Activity activity,
+      final Continuation<? super Long> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
       @Override
       @NonNull
@@ -245,11 +311,11 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object insertPlan(final Plan plan, final Continuation<? super Long> arg1) {
+  public Object insertPlan(final Plan plan, final Continuation<? super Long> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
       @Override
       @NonNull
@@ -263,12 +329,12 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
   public Object insertPlanActivity(final PlanActivity planActivity,
-      final Continuation<? super Unit> arg1) {
+      final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -282,12 +348,12 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
   public Object insertHistoryEntry(final HistoryEntry entry,
-      final Continuation<? super Unit> arg1) {
+      final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -301,11 +367,30 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object updatePlan(final Plan plan, final Continuation<? super Unit> arg1) {
+  public Object deleteHistoryEntry(final HistoryEntry entry,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __deletionAdapterOfHistoryEntry.handle(entry);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object updatePlan(final Plan plan, final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -319,12 +404,12 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
   public Object updatePlanActivity(final PlanActivity planActivity,
-      final Continuation<? super Unit> arg1) {
+      final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -338,11 +423,30 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __db.endTransaction();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object deletePlan(final long planId, final Continuation<? super Unit> arg1) {
+  public Object updateHistoryEntry(final HistoryEntry entry,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __updateAdapterOfHistoryEntry.handle(entry);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deletePlan(final long planId, final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -363,11 +467,11 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __preparedStmtOfDeletePlan.release(_stmt);
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
-  public Object deletePlanActivity(final long id, final Continuation<? super Unit> arg1) {
+  public Object deletePlanActivity(final long id, final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
       @Override
       @NonNull
@@ -388,7 +492,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           __preparedStmtOfDeletePlanActivity.release(_stmt);
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
@@ -611,7 +715,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
-  public Object getPlanById(final long planId, final Continuation<? super Plan> arg1) {
+  public Object getPlanById(final long planId, final Continuation<? super Plan> $completion) {
     final String _sql = "SELECT * FROM plans WHERE id = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
@@ -650,12 +754,12 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           _statement.release();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
   public Object getPlanActivitiesByPlanId(final long planId,
-      final Continuation<? super List<PlanActivity>> arg1) {
+      final Continuation<? super List<PlanActivity>> $completion) {
     final String _sql = "SELECT * FROM plan_activities WHERE planId = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
@@ -702,7 +806,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           _statement.release();
         }
       }
-    }, arg1);
+    }, $completion);
   }
 
   @Override
@@ -951,7 +1055,7 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
-  public Object getActivityById(final long id, final Continuation<? super Activity> arg1) {
+  public Object getActivityById(final long id, final Continuation<? super Activity> $completion) {
     final String _sql = "SELECT * FROM activities WHERE id = ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
@@ -992,7 +1096,42 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           _statement.release();
         }
       }
-    }, arg1);
+    }, $completion);
+  }
+
+  @Override
+  public Object deleteHistoryEntries(final List<Long> ids,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final StringBuilder _stringBuilder = StringUtil.newStringBuilder();
+        _stringBuilder.append("DELETE FROM history WHERE id IN (");
+        final int _inputSize = ids.size();
+        StringUtil.appendPlaceholders(_stringBuilder, _inputSize);
+        _stringBuilder.append(")");
+        final String _sql = _stringBuilder.toString();
+        final SupportSQLiteStatement _stmt = __db.compileStatement(_sql);
+        int _argIndex = 1;
+        for (Long _item : ids) {
+          if (_item == null) {
+            _stmt.bindNull(_argIndex);
+          } else {
+            _stmt.bindLong(_argIndex, _item);
+          }
+          _argIndex++;
+        }
+        __db.beginTransaction();
+        try {
+          _stmt.executeUpdateDelete();
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
   }
 
   @NonNull

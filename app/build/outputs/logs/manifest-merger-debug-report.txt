@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-41:12
-INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-41:12
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-43:12
+INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-43:12
+INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-43:12
+INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:2:1-43:12
 MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/81dfcfa71cb0560a89342a44980d82b1/transformed/jetified-appcompat-resources-1.7.0/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.appcompat:appcompat:1.7.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/08f49e824edcc5aff05e149061bd0f76/transformed/appcompat-1.7.0/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/08f255e6cb16238a36a0a26922d20da4/transformed/drawerlayout-1.0.0/AndroidManifest.xml:17:1-22:12
@@ -91,8 +91,8 @@ ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidMani
 	android:name
 		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:5:22-78
 application
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:7:5-39:19
-INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:7:5-39:19
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:7:5-41:19
+INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:7:5-41:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/c000ddd5b6afd743992a5049b5759eb7/transformed/jetified-ui-tooling-release/AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/c000ddd5b6afd743992a5049b5759eb7/transformed/jetified-ui-tooling-release/AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-test-manifest:1.7.5] /Users/gsteele/.gradle/caches/9.0.0/transforms/e5228f82cf0fc33e9ca610a384bfbbba/transformed/jetified-ui-test-manifest-1.7.5/AndroidManifest.xml:22:5-26:19
@@ -116,59 +116,63 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/gste
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.15.0] /Users/gsteele/.gradle/caches/9.0.0/transforms/6b5be532c9809ada4980149ff49b2c6b/transformed/core-1.15.0/AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:10:9-35
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:12:9-35
 	android:label
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:9:9-32
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:11:9-32
+	android:roundIcon
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:10:9-54
+	android:icon
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:9:9-43
 	android:allowBackup
 		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:8:9-35
 	android:theme
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:11:9-45
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:13:9-45
 activity#com.fitflow.MainActivity
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:12:9-19:20
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:14:9-21:20
 	android:exported
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:14:13-36
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:16:13-36
 	android:name
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:13:13-41
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:15:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:15:13-18:29
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:17:13-20:29
 action#android.intent.action.MAIN
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:16:17-69
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:18:17-69
 	android:name
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:16:25-66
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:18:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:17:17-77
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:19:17-77
 	android:name
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:17:27-74
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:19:27-74
 receiver#com.fitflow.NotificationReceiver
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:21:9-28:20
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:23:9-30:20
 	android:enabled
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:23:13-35
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:25:13-35
 	android:exported
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:24:13-37
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:26:13-37
 	android:name
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:22:13-49
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:24:13-49
 intent-filter#action:name:android.intent.action.BOOT_COMPLETED
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:25:13-27:29
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:27:13-29:29
 action#android.intent.action.BOOT_COMPLETED
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:26:17-79
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:28:17-79
 	android:name
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:26:25-76
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:28:25-76
 provider#androidx.core.content.FileProvider
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:30:9-38:20
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:32:9-40:20
 	android:grantUriPermissions
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:34:13-47
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:36:13-47
 	android:authorities
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:32:13-59
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:34:13-59
 	android:exported
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:33:13-37
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:35:13-37
 	android:name
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:31:13-62
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:33:13-62
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:35:13-37:54
+ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:37:13-39:54
 	android:resource
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:37:17-51
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:39:17-51
 	android:name
-		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:36:17-67
+		ADDED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml:38:17-67
 uses-sdk
 INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/gsteele/AndroidStudioProjects/fitflow/app/src/main/AndroidManifest.xml

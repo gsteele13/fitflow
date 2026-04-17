@@ -56,6 +56,15 @@ interface WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHistoryEntry(entry: HistoryEntry)
 
+    @Update
+    suspend fun updateHistoryEntry(entry: HistoryEntry)
+
+    @Delete
+    suspend fun deleteHistoryEntry(entry: HistoryEntry)
+
+    @Query("DELETE FROM history WHERE id IN (:ids)")
+    suspend fun deleteHistoryEntries(ids: List<Long>)
+
     @Query("SELECT * FROM history ORDER BY dateTime DESC")
     fun getAllHistory(): Flow<List<HistoryEntry>>
 
