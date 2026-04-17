@@ -32,11 +32,3 @@ https://github.com/gsteele13/fitflow/raw/refs/heads/main/app/build/outputs/apk/d
 In principle, you can download it to your phone and install it. You need to first enable "install from unknown sources" on your phone:
 
 https://share.google/aimode/s3uvLQMUMhMbqVULz
-
-```python
-!ls screenshots/*
-```
-
-```python
-
-```
