@@ -42,3 +42,11 @@ capture/
 .kotlin/
 *.hprof
 gradle/wrapper/gradle-wrapper.jar
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+*.ipynb
+__pycache__
+*.py[cod]
+*$py.class
