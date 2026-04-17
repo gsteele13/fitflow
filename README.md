@@ -8,7 +8,7 @@ of the week.
 The workout activities are really simple: just a name and a description. 
 
 In my day view, I will see all things I have scheduled for that day. I can click on them to mark them as done, adding an optional note. 
-I can also add activities that are not scheduled. And also add notes: like "knee is sore" or "have headache in evening", etc. 
+I can also add activities that are not scheduled to my history if I go "off piste". And I can also add free form notes to my history: like "knee is sore" or "have headache in evening", etc. 
 
 This all goes into a history that can be viewed in the app, and exported as CSV or an HTML table.
 
