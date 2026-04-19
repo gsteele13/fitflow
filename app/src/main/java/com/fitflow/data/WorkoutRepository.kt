@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 class WorkoutRepository(private val workoutDao: WorkoutDao) {
 
     val allActivities: Flow<List<Activity>> = workoutDao.getAllActivities()
+    val activitiesInPlans: Flow<List<Activity>> = workoutDao.getActivitiesInPlans()
     val allPlans: Flow<List<Plan>> = workoutDao.getAllPlans()
     val allHistory: Flow<List<HistoryEntry>> = workoutDao.getAllHistory()
 

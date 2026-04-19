@@ -161,6 +161,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
     }
     
     val allActivities: Flow<List<Activity>> = repository.allActivities
+    val activitiesInPlans: Flow<List<Activity>> = repository.activitiesInPlans
 
     fun addUnscheduledActivity(name: String, description: String, date: LocalDate, notes: String) {
         viewModelScope.launch {

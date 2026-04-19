@@ -84,4 +84,12 @@ interface WorkoutDao {
 
     @Query("DELETE FROM plan_activities WHERE id = :id")
     suspend fun deletePlanActivity(id: Long)
+
+    @Query("""
+        SELECT DISTINCT a.* 
+        FROM activities a 
+        JOIN plan_activities pa ON a.id = pa.activityId 
+        JOIN plans p ON pa.planId = p.id
+    """)
+    fun getActivitiesInPlans(): Flow<List<Activity>>
 }

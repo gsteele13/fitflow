@@ -1100,6 +1100,58 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
+  public Flow<List<Activity>> getActivitiesInPlans() {
+    final String _sql = "\n"
+            + "        SELECT DISTINCT a.* \n"
+            + "        FROM activities a \n"
+            + "        JOIN plan_activities pa ON a.id = pa.activityId \n"
+            + "        JOIN plans p ON pa.planId = p.id\n"
+            + "    ";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"activities", "plan_activities",
+        "plans"}, new Callable<List<Activity>>() {
+      @Override
+      @NonNull
+      public List<Activity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final List<Activity> _result = new ArrayList<Activity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final Activity _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final String _tmpName;
+            if (_cursor.isNull(_cursorIndexOfName)) {
+              _tmpName = null;
+            } else {
+              _tmpName = _cursor.getString(_cursorIndexOfName);
+            }
+            final String _tmpDescription;
+            if (_cursor.isNull(_cursorIndexOfDescription)) {
+              _tmpDescription = null;
+            } else {
+              _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            }
+            _item = new Activity(_tmpId,_tmpName,_tmpDescription);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
   public Object deleteHistoryEntries(final List<Long> ids,
       final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {

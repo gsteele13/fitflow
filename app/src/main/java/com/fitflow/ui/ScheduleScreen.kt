@@ -61,7 +61,7 @@ fun ScheduleScreen(viewModel: WorkoutViewModel = viewModel()) {
     }
 
     if (showAddDialog) {
-        val allActivities by viewModel.allActivities.collectAsState(initial = emptyList())
+        val activitiesInPlans by viewModel.activitiesInPlans.collectAsState(initial = emptyList())
         val selectedDate = today.plusDays((pagerState.currentPage - centerPage).toLong())
         AddActivityOrNoteDialog(
             onDismiss = { showAddDialog = false },
@@ -77,7 +77,7 @@ fun ScheduleScreen(viewModel: WorkoutViewModel = viewModel()) {
                 viewModel.addUnscheduledActivity(activity.name, activity.description, selectedDate, "")
                 showAddDialog = false
             },
-            availableActivities = allActivities
+            availableActivities = activitiesInPlans
         )
     }
 }
