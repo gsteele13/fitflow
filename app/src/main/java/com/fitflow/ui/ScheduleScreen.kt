@@ -205,7 +205,7 @@ fun AddActivityOrNoteDialog(
         "MENU" -> {
             AlertDialog(
                 onDismissRequest = onDismiss,
-                title = { Text("Add Item") },
+                title = { Text("Add item to history:") },
                 text = {
                     Column {
                         Button(onClick = { dialogMode = "UNSCHEDULED" }, modifier = Modifier.fillMaxWidth()) {
