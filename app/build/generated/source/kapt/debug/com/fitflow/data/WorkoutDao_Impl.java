@@ -48,6 +48,10 @@ public final class WorkoutDao_Impl implements WorkoutDao {
 
   private final EntityInsertionAdapter<HistoryEntry> __insertionAdapterOfHistoryEntry;
 
+  private final EntityInsertionAdapter<PlanSnapshot> __insertionAdapterOfPlanSnapshot;
+
+  private final EntityInsertionAdapter<PlanActivitySnapshot> __insertionAdapterOfPlanActivitySnapshot;
+
   private final EntityDeletionOrUpdateAdapter<HistoryEntry> __deletionAdapterOfHistoryEntry;
 
   private final EntityDeletionOrUpdateAdapter<Plan> __updateAdapterOfPlan;
@@ -171,6 +175,63 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         } else {
           statement.bindString(7, _tmp_1);
         }
+      }
+    };
+    this.__insertionAdapterOfPlanSnapshot = new EntityInsertionAdapter<PlanSnapshot>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR REPLACE INTO `plan_snapshots` (`id`,`originalPlanId`,`planName`,`snapshotDate`) VALUES (nullif(?, 0),?,?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final PlanSnapshot entity) {
+        statement.bindLong(1, entity.getId());
+        statement.bindLong(2, entity.getOriginalPlanId());
+        if (entity.getPlanName() == null) {
+          statement.bindNull(3);
+        } else {
+          statement.bindString(3, entity.getPlanName());
+        }
+        final Long _tmp = __converters.dateToTimestamp(entity.getSnapshotDate());
+        if (_tmp == null) {
+          statement.bindNull(4);
+        } else {
+          statement.bindLong(4, _tmp);
+        }
+      }
+    };
+    this.__insertionAdapterOfPlanActivitySnapshot = new EntityInsertionAdapter<PlanActivitySnapshot>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR REPLACE INTO `plan_activity_snapshots` (`id`,`planSnapshotId`,`activityName`,`activityDescription`,`daysOfWeek`,`isActive`) VALUES (nullif(?, 0),?,?,?,?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final PlanActivitySnapshot entity) {
+        statement.bindLong(1, entity.getId());
+        statement.bindLong(2, entity.getPlanSnapshotId());
+        if (entity.getActivityName() == null) {
+          statement.bindNull(3);
+        } else {
+          statement.bindString(3, entity.getActivityName());
+        }
+        if (entity.getActivityDescription() == null) {
+          statement.bindNull(4);
+        } else {
+          statement.bindString(4, entity.getActivityDescription());
+        }
+        final String _tmp = __converters.fromIntList(entity.getDaysOfWeek());
+        if (_tmp == null) {
+          statement.bindNull(5);
+        } else {
+          statement.bindString(5, _tmp);
+        }
+        final int _tmp_1 = entity.isActive() ? 1 : 0;
+        statement.bindLong(6, _tmp_1);
       }
     };
     this.__deletionAdapterOfHistoryEntry = new EntityDeletionOrUpdateAdapter<HistoryEntry>(__db) {
@@ -361,6 +422,44 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         __db.beginTransaction();
         try {
           __insertionAdapterOfHistoryEntry.insert(entry);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object insertPlanSnapshot(final PlanSnapshot snapshot,
+      final Continuation<? super Long> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Long>() {
+      @Override
+      @NonNull
+      public Long call() throws Exception {
+        __db.beginTransaction();
+        try {
+          final Long _result = __insertionAdapterOfPlanSnapshot.insertAndReturnId(snapshot);
+          __db.setTransactionSuccessful();
+          return _result;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object insertPlanActivitySnapshots(final List<PlanActivitySnapshot> snapshots,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __insertionAdapterOfPlanActivitySnapshot.insert(snapshots);
           __db.setTransactionSuccessful();
           return Unit.INSTANCE;
         } finally {
@@ -1152,6 +1251,120 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   }
 
   @Override
+  public Flow<List<PlanSnapshot>> getAllPlanSnapshots() {
+    final String _sql = "SELECT * FROM plan_snapshots ORDER BY snapshotDate DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"plan_snapshots"}, new Callable<List<PlanSnapshot>>() {
+      @Override
+      @NonNull
+      public List<PlanSnapshot> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfOriginalPlanId = CursorUtil.getColumnIndexOrThrow(_cursor, "originalPlanId");
+          final int _cursorIndexOfPlanName = CursorUtil.getColumnIndexOrThrow(_cursor, "planName");
+          final int _cursorIndexOfSnapshotDate = CursorUtil.getColumnIndexOrThrow(_cursor, "snapshotDate");
+          final List<PlanSnapshot> _result = new ArrayList<PlanSnapshot>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final PlanSnapshot _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final long _tmpOriginalPlanId;
+            _tmpOriginalPlanId = _cursor.getLong(_cursorIndexOfOriginalPlanId);
+            final String _tmpPlanName;
+            if (_cursor.isNull(_cursorIndexOfPlanName)) {
+              _tmpPlanName = null;
+            } else {
+              _tmpPlanName = _cursor.getString(_cursorIndexOfPlanName);
+            }
+            final LocalDateTime _tmpSnapshotDate;
+            final Long _tmp;
+            if (_cursor.isNull(_cursorIndexOfSnapshotDate)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getLong(_cursorIndexOfSnapshotDate);
+            }
+            _tmpSnapshotDate = __converters.fromTimestamp(_tmp);
+            _item = new PlanSnapshot(_tmpId,_tmpOriginalPlanId,_tmpPlanName,_tmpSnapshotDate);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Object getActivitiesForSnapshot(final long snapshotId,
+      final Continuation<? super List<PlanActivitySnapshot>> $completion) {
+    final String _sql = "SELECT * FROM plan_activity_snapshots WHERE planSnapshotId = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, snapshotId);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<List<PlanActivitySnapshot>>() {
+      @Override
+      @NonNull
+      public List<PlanActivitySnapshot> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfPlanSnapshotId = CursorUtil.getColumnIndexOrThrow(_cursor, "planSnapshotId");
+          final int _cursorIndexOfActivityName = CursorUtil.getColumnIndexOrThrow(_cursor, "activityName");
+          final int _cursorIndexOfActivityDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "activityDescription");
+          final int _cursorIndexOfDaysOfWeek = CursorUtil.getColumnIndexOrThrow(_cursor, "daysOfWeek");
+          final int _cursorIndexOfIsActive = CursorUtil.getColumnIndexOrThrow(_cursor, "isActive");
+          final List<PlanActivitySnapshot> _result = new ArrayList<PlanActivitySnapshot>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final PlanActivitySnapshot _item;
+            final long _tmpId;
+            _tmpId = _cursor.getLong(_cursorIndexOfId);
+            final long _tmpPlanSnapshotId;
+            _tmpPlanSnapshotId = _cursor.getLong(_cursorIndexOfPlanSnapshotId);
+            final String _tmpActivityName;
+            if (_cursor.isNull(_cursorIndexOfActivityName)) {
+              _tmpActivityName = null;
+            } else {
+              _tmpActivityName = _cursor.getString(_cursorIndexOfActivityName);
+            }
+            final String _tmpActivityDescription;
+            if (_cursor.isNull(_cursorIndexOfActivityDescription)) {
+              _tmpActivityDescription = null;
+            } else {
+              _tmpActivityDescription = _cursor.getString(_cursorIndexOfActivityDescription);
+            }
+            final List<Integer> _tmpDaysOfWeek;
+            final String _tmp;
+            if (_cursor.isNull(_cursorIndexOfDaysOfWeek)) {
+              _tmp = null;
+            } else {
+              _tmp = _cursor.getString(_cursorIndexOfDaysOfWeek);
+            }
+            _tmpDaysOfWeek = __converters.toIntList(_tmp);
+            final boolean _tmpIsActive;
+            final int _tmp_1;
+            _tmp_1 = _cursor.getInt(_cursorIndexOfIsActive);
+            _tmpIsActive = _tmp_1 != 0;
+            _item = new PlanActivitySnapshot(_tmpId,_tmpPlanSnapshotId,_tmpActivityName,_tmpActivityDescription,_tmpDaysOfWeek,_tmpIsActive);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
   public Object deleteHistoryEntries(final List<Long> ids,
       final Continuation<? super Unit> $completion) {
     return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
@@ -1167,6 +1380,76 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         final SupportSQLiteStatement _stmt = __db.compileStatement(_sql);
         int _argIndex = 1;
         for (Long _item : ids) {
+          if (_item == null) {
+            _stmt.bindNull(_argIndex);
+          } else {
+            _stmt.bindLong(_argIndex, _item);
+          }
+          _argIndex++;
+        }
+        __db.beginTransaction();
+        try {
+          _stmt.executeUpdateDelete();
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deletePlanSnapshots(final List<Long> ids,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final StringBuilder _stringBuilder = StringUtil.newStringBuilder();
+        _stringBuilder.append("DELETE FROM plan_snapshots WHERE id IN (");
+        final int _inputSize = ids.size();
+        StringUtil.appendPlaceholders(_stringBuilder, _inputSize);
+        _stringBuilder.append(")");
+        final String _sql = _stringBuilder.toString();
+        final SupportSQLiteStatement _stmt = __db.compileStatement(_sql);
+        int _argIndex = 1;
+        for (Long _item : ids) {
+          if (_item == null) {
+            _stmt.bindNull(_argIndex);
+          } else {
+            _stmt.bindLong(_argIndex, _item);
+          }
+          _argIndex++;
+        }
+        __db.beginTransaction();
+        try {
+          _stmt.executeUpdateDelete();
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deletePlanActivitySnapshots(final List<Long> snapshotIds,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final StringBuilder _stringBuilder = StringUtil.newStringBuilder();
+        _stringBuilder.append("DELETE FROM plan_activity_snapshots WHERE planSnapshotId IN (");
+        final int _inputSize = snapshotIds.size();
+        StringUtil.appendPlaceholders(_stringBuilder, _inputSize);
+        _stringBuilder.append(")");
+        final String _sql = _stringBuilder.toString();
+        final SupportSQLiteStatement _stmt = __db.compileStatement(_sql);
+        int _argIndex = 1;
+        for (Long _item : snapshotIds) {
           if (_item == null) {
             _stmt.bindNull(_argIndex);
           } else {

@@ -42,6 +42,24 @@ data class HistoryEntry(
     val status: HistoryStatus
 )
 
+@Entity(tableName = "plan_snapshots")
+data class PlanSnapshot(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val originalPlanId: Long,
+    val planName: String,
+    val snapshotDate: LocalDateTime
+)
+
+@Entity(tableName = "plan_activity_snapshots")
+data class PlanActivitySnapshot(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val planSnapshotId: Long,
+    val activityName: String,
+    val activityDescription: String,
+    val daysOfWeek: List<Int>,
+    val isActive: Boolean
+)
+
 data class PlanActivityWithDetails(
     val id: Long,
     val planId: Long,

@@ -92,4 +92,22 @@ interface WorkoutDao {
         JOIN plans p ON pa.planId = p.id
     """)
     fun getActivitiesInPlans(): Flow<List<Activity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlanSnapshot(snapshot: PlanSnapshot): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlanActivitySnapshots(snapshots: List<PlanActivitySnapshot>)
+
+    @Query("SELECT * FROM plan_snapshots ORDER BY snapshotDate DESC")
+    fun getAllPlanSnapshots(): Flow<List<PlanSnapshot>>
+
+    @Query("SELECT * FROM plan_activity_snapshots WHERE planSnapshotId = :snapshotId")
+    suspend fun getActivitiesForSnapshot(snapshotId: Long): List<PlanActivitySnapshot>
+
+    @Query("DELETE FROM plan_snapshots WHERE id IN (:ids)")
+    suspend fun deletePlanSnapshots(ids: List<Long>)
+
+    @Query("DELETE FROM plan_activity_snapshots WHERE planSnapshotId IN (:snapshotIds)")
+    suspend fun deletePlanActivitySnapshots(snapshotIds: List<Long>)
 }

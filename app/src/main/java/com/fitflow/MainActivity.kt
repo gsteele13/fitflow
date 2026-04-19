@@ -17,6 +17,7 @@ import com.fitflow.ui.ScheduleScreen
 import com.fitflow.ui.PlansScreen
 import com.fitflow.ui.PlanDetailsScreen
 import com.fitflow.ui.HistoryScreen
+import com.fitflow.ui.PlanHistoryScreen
 import com.fitflow.ui.theme.FitFlowTheme
 import kotlinx.coroutines.launch
 
@@ -64,6 +65,14 @@ fun MainScreen() {
                     selected = false,
                     onClick = {
                         navController.navigate("history")
+                        scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Plan History") },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("plan_history")
                         scope.launch { drawerState.close() }
                     }
                 )
@@ -116,6 +125,7 @@ fun MainScreen() {
                     PlanDetailsScreen(planId = planId, onBack = { navController.popBackStack() })
                 }
                 composable("history") { HistoryScreen() }
+                composable("plan_history") { PlanHistoryScreen() }
             }
         }
     }

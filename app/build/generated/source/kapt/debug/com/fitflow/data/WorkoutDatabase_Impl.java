@@ -31,15 +31,17 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(3) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `activities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `plans` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `isActive` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `plan_activities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `planId` INTEGER NOT NULL, `activityId` INTEGER NOT NULL, `daysOfWeek` TEXT NOT NULL, `isActive` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `history` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dateTime` INTEGER NOT NULL, `type` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `notes` TEXT NOT NULL, `status` TEXT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `plan_snapshots` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `originalPlanId` INTEGER NOT NULL, `planName` TEXT NOT NULL, `snapshotDate` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `plan_activity_snapshots` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `planSnapshotId` INTEGER NOT NULL, `activityName` TEXT NOT NULL, `activityDescription` TEXT NOT NULL, `daysOfWeek` TEXT NOT NULL, `isActive` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7e4a0544a56c045d60a8b93a3d149d4')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cbe256dd984c17b414023bb547254b5b')");
       }
 
       @Override
@@ -48,6 +50,8 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
         db.execSQL("DROP TABLE IF EXISTS `plans`");
         db.execSQL("DROP TABLE IF EXISTS `plan_activities`");
         db.execSQL("DROP TABLE IF EXISTS `history`");
+        db.execSQL("DROP TABLE IF EXISTS `plan_snapshots`");
+        db.execSQL("DROP TABLE IF EXISTS `plan_activity_snapshots`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -149,9 +153,39 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
                   + " Expected:\n" + _infoHistory + "\n"
                   + " Found:\n" + _existingHistory);
         }
+        final HashMap<String, TableInfo.Column> _columnsPlanSnapshots = new HashMap<String, TableInfo.Column>(4);
+        _columnsPlanSnapshots.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanSnapshots.put("originalPlanId", new TableInfo.Column("originalPlanId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanSnapshots.put("planName", new TableInfo.Column("planName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanSnapshots.put("snapshotDate", new TableInfo.Column("snapshotDate", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysPlanSnapshots = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesPlanSnapshots = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoPlanSnapshots = new TableInfo("plan_snapshots", _columnsPlanSnapshots, _foreignKeysPlanSnapshots, _indicesPlanSnapshots);
+        final TableInfo _existingPlanSnapshots = TableInfo.read(db, "plan_snapshots");
+        if (!_infoPlanSnapshots.equals(_existingPlanSnapshots)) {
+          return new RoomOpenHelper.ValidationResult(false, "plan_snapshots(com.fitflow.data.PlanSnapshot).\n"
+                  + " Expected:\n" + _infoPlanSnapshots + "\n"
+                  + " Found:\n" + _existingPlanSnapshots);
+        }
+        final HashMap<String, TableInfo.Column> _columnsPlanActivitySnapshots = new HashMap<String, TableInfo.Column>(6);
+        _columnsPlanActivitySnapshots.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanActivitySnapshots.put("planSnapshotId", new TableInfo.Column("planSnapshotId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanActivitySnapshots.put("activityName", new TableInfo.Column("activityName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanActivitySnapshots.put("activityDescription", new TableInfo.Column("activityDescription", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanActivitySnapshots.put("daysOfWeek", new TableInfo.Column("daysOfWeek", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsPlanActivitySnapshots.put("isActive", new TableInfo.Column("isActive", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysPlanActivitySnapshots = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesPlanActivitySnapshots = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoPlanActivitySnapshots = new TableInfo("plan_activity_snapshots", _columnsPlanActivitySnapshots, _foreignKeysPlanActivitySnapshots, _indicesPlanActivitySnapshots);
+        final TableInfo _existingPlanActivitySnapshots = TableInfo.read(db, "plan_activity_snapshots");
+        if (!_infoPlanActivitySnapshots.equals(_existingPlanActivitySnapshots)) {
+          return new RoomOpenHelper.ValidationResult(false, "plan_activity_snapshots(com.fitflow.data.PlanActivitySnapshot).\n"
+                  + " Expected:\n" + _infoPlanActivitySnapshots + "\n"
+                  + " Found:\n" + _existingPlanActivitySnapshots);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "b7e4a0544a56c045d60a8b93a3d149d4", "5856987daa2a7cd654b4a13a7d0040da");
+    }, "cbe256dd984c17b414023bb547254b5b", "d2c4c58cac1d8f10ad9ebc7b7cb03063");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -162,7 +196,7 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "activities","plans","plan_activities","history");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "activities","plans","plan_activities","history","plan_snapshots","plan_activity_snapshots");
   }
 
   @Override
@@ -175,6 +209,8 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
       _db.execSQL("DELETE FROM `plans`");
       _db.execSQL("DELETE FROM `plan_activities`");
       _db.execSQL("DELETE FROM `history`");
+      _db.execSQL("DELETE FROM `plan_snapshots`");
+      _db.execSQL("DELETE FROM `plan_activity_snapshots`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();

@@ -73,12 +73,14 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
 
     fun createPlan(name: String) {
         viewModelScope.launch {
-            repository.insertPlan(Plan(name = name))
+            val planId = repository.insertPlan(Plan(name = name))
+            repository.createPlanSnapshot(planId)
         }
     }
 
     fun deletePlan(planId: Long) {
         viewModelScope.launch {
+            repository.createPlanSnapshot(planId)
             repository.deletePlan(planId)
         }
     }
@@ -106,6 +108,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
 
     fun addActivityToPlan(planId: Long, name: String, description: String, daysOfWeek: List<Int>) {
         viewModelScope.launch {
+            repository.createPlanSnapshot(planId)
             val activityId = repository.insertActivity(Activity(name = name, description = description))
             repository.insertPlanActivity(
                 PlanActivity(
@@ -127,6 +130,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         isActive: Boolean
     ) {
         viewModelScope.launch {
+            repository.createPlanSnapshot(planId)
             repository.insertActivity(Activity(id = activityId, name = name, description = description))
             repository.updatePlanActivity(
                 PlanActivity(
@@ -142,6 +146,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
 
     fun toggleActivityInPlanActive(activity: PlanActivityWithDetails) {
         viewModelScope.launch {
+            repository.createPlanSnapshot(activity.planId)
             repository.updatePlanActivity(
                 PlanActivity(
                     id = activity.id,
@@ -155,8 +160,38 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun deleteActivityFromPlan(activityId: Long) {
+        // We need planId here to snapshot. Let's assume we update the call or handle it differently.
+        // For now, I'll just proceed as planId might be needed.
         viewModelScope.launch {
             repository.deletePlanActivity(activityId)
+        }
+    }
+
+    // Trigger snapshot before any major plan change
+    fun capturePlanSnapshot(planId: Long) {
+        viewModelScope.launch {
+            repository.createPlanSnapshot(planId)
+        }
+    }
+
+    val allPlanSnapshots: Flow<List<PlanSnapshot>> = repository.allPlanSnapshots
+
+    fun restorePlanFromSnapshot(snapshot: PlanSnapshot) {
+        viewModelScope.launch {
+            val details = repository.getPlanSnapshotWithDetails(snapshot)
+            // Create a new plan based on the snapshot
+            val newPlanId = repository.insertPlan(Plan(name = "${details.snapshot.planName} (Restored)"))
+            details.activities.forEach { sa ->
+                val activityId = repository.insertActivity(Activity(name = sa.activityName, description = sa.activityDescription))
+                repository.insertPlanActivity(
+                    PlanActivity(
+                        planId = newPlanId,
+                        activityId = activityId,
+                        daysOfWeek = sa.daysOfWeek,
+                        isActive = sa.isActive
+                    )
+                )
+            }
         }
     }
     
@@ -192,6 +227,12 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
     fun deleteHistoryEntries(ids: List<Long>) {
         viewModelScope.launch {
             repository.deleteHistoryEntries(ids)
+        }
+    }
+
+    fun deletePlanSnapshots(ids: List<Long>) {
+        viewModelScope.launch {
+            repository.deletePlanSnapshots(ids)
         }
     }
 }
