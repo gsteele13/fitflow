@@ -23,7 +23,21 @@ import java.time.DayOfWeek
 fun ScheduleScreen(viewModel: WorkoutViewModel = viewModel()) {
     val today = LocalDate.now()
     val startOfWeek = today.with(DayOfWeek.MONDAY)
-    val pagerState = rememberPagerState(pageCount = { 7 }, initialPage = today.dayOfWeek.value - 1)
+    
+    // We'll allow scrolling up to 52 weeks into the future (about a year)
+    val pageCount = 365
+    val initialPage = today.toEpochDay().toInt() - startOfWeek.toEpochDay().toInt()
+    
+    // Using a large number of pages to simulate an infinite or very long schedule
+    // Start at a high number so user can scroll back a bit if they want, 
+    // but the request was specifically for "upcoming weeks".
+    // Let's use 10,000 pages and center "today" at page 5,000.
+    val totalPages = 10000
+    val centerPage = 5000
+    val pagerState = rememberPagerState(
+        pageCount = { totalPages },
+        initialPage = centerPage
+    )
     
     val scope = rememberCoroutineScope()
     var showAddDialog by remember { mutableStateOf(false) }
@@ -40,7 +54,7 @@ fun ScheduleScreen(viewModel: WorkoutViewModel = viewModel()) {
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
-                val date = startOfWeek.plusDays(page.toLong())
+                val date = today.plusDays((page - centerPage).toLong())
                 DaySchedule(date, viewModel)
             }
         }
@@ -48,7 +62,7 @@ fun ScheduleScreen(viewModel: WorkoutViewModel = viewModel()) {
 
     if (showAddDialog) {
         val allActivities by viewModel.allActivities.collectAsState(initial = emptyList())
-        val selectedDate = startOfWeek.plusDays(pagerState.currentPage.toLong())
+        val selectedDate = today.plusDays((pagerState.currentPage - centerPage).toLong())
         AddActivityOrNoteDialog(
             onDismiss = { showAddDialog = false },
             onAddNote = { note -> 
