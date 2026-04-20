@@ -41,8 +41,24 @@ interface WorkoutDao {
             WHERE h.status IN ('COMPLETED', 'SKIPPED') 
             AND h.dateTime BETWEEN :startOfDay AND :endOfDay
         )
+        UNION
+        SELECT a.*
+        FROM activities a
+        JOIN ad_hoc_activities aha ON a.id = aha.activityId
+        WHERE aha.scheduledDate BETWEEN :startOfDay AND :endOfDay
+        AND a.name NOT IN (
+            SELECT h.name FROM history h 
+            WHERE h.status IN ('COMPLETED', 'SKIPPED') 
+            AND h.dateTime BETWEEN :startOfDay AND :endOfDay
+        )
     """)
     fun getScheduledActivitiesForDay(dayOfWeek: Int, startOfDay: LocalDateTime, endOfDay: LocalDateTime): Flow<List<Activity>>
+
+    @Insert
+    suspend fun insertAdHocActivity(adHocActivity: AdHocActivity)
+
+    @Query("DELETE FROM ad_hoc_activities WHERE activityId = :activityId AND scheduledDate BETWEEN :startOfDay AND :endOfDay")
+    suspend fun deleteAdHocActivity(activityId: Long, startOfDay: LocalDateTime, endOfDay: LocalDateTime)
 
     @Query("DELETE FROM plans WHERE id = :planId")
     suspend fun deletePlan(planId: Long)

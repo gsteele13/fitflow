@@ -31,7 +31,7 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(3) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(4) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `activities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL)");
@@ -40,8 +40,9 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
         db.execSQL("CREATE TABLE IF NOT EXISTS `history` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dateTime` INTEGER NOT NULL, `type` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `notes` TEXT NOT NULL, `status` TEXT NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `plan_snapshots` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `originalPlanId` INTEGER NOT NULL, `planName` TEXT NOT NULL, `snapshotDate` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `plan_activity_snapshots` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `planSnapshotId` INTEGER NOT NULL, `activityName` TEXT NOT NULL, `activityDescription` TEXT NOT NULL, `daysOfWeek` TEXT NOT NULL, `isActive` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ad_hoc_activities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `activityId` INTEGER NOT NULL, `scheduledDate` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cbe256dd984c17b414023bb547254b5b')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1ae801e07b82a3b4a0989b4378b5590f')");
       }
 
       @Override
@@ -52,6 +53,7 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
         db.execSQL("DROP TABLE IF EXISTS `history`");
         db.execSQL("DROP TABLE IF EXISTS `plan_snapshots`");
         db.execSQL("DROP TABLE IF EXISTS `plan_activity_snapshots`");
+        db.execSQL("DROP TABLE IF EXISTS `ad_hoc_activities`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -183,9 +185,22 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
                   + " Expected:\n" + _infoPlanActivitySnapshots + "\n"
                   + " Found:\n" + _existingPlanActivitySnapshots);
         }
+        final HashMap<String, TableInfo.Column> _columnsAdHocActivities = new HashMap<String, TableInfo.Column>(3);
+        _columnsAdHocActivities.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsAdHocActivities.put("activityId", new TableInfo.Column("activityId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsAdHocActivities.put("scheduledDate", new TableInfo.Column("scheduledDate", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysAdHocActivities = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesAdHocActivities = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoAdHocActivities = new TableInfo("ad_hoc_activities", _columnsAdHocActivities, _foreignKeysAdHocActivities, _indicesAdHocActivities);
+        final TableInfo _existingAdHocActivities = TableInfo.read(db, "ad_hoc_activities");
+        if (!_infoAdHocActivities.equals(_existingAdHocActivities)) {
+          return new RoomOpenHelper.ValidationResult(false, "ad_hoc_activities(com.fitflow.data.AdHocActivity).\n"
+                  + " Expected:\n" + _infoAdHocActivities + "\n"
+                  + " Found:\n" + _existingAdHocActivities);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "cbe256dd984c17b414023bb547254b5b", "d2c4c58cac1d8f10ad9ebc7b7cb03063");
+    }, "1ae801e07b82a3b4a0989b4378b5590f", "6586a42cf02d73b087ebde1e871cee42");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -196,7 +211,7 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "activities","plans","plan_activities","history","plan_snapshots","plan_activity_snapshots");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "activities","plans","plan_activities","history","plan_snapshots","plan_activity_snapshots","ad_hoc_activities");
   }
 
   @Override
@@ -211,6 +226,7 @@ public final class WorkoutDatabase_Impl extends WorkoutDatabase {
       _db.execSQL("DELETE FROM `history`");
       _db.execSQL("DELETE FROM `plan_snapshots`");
       _db.execSQL("DELETE FROM `plan_activity_snapshots`");
+      _db.execSQL("DELETE FROM `ad_hoc_activities`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();

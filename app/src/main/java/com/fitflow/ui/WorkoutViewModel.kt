@@ -32,6 +32,10 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
 
     fun markAsDone(activity: Activity, date: LocalDate, notes: String) {
         viewModelScope.launch {
+            val startOfDay = date.atStartOfDay()
+            val endOfDay = date.atTime(23, 59, 59)
+            repository.deleteAdHocActivity(activity.id, startOfDay, endOfDay)
+
             val entry = HistoryEntry(
                 dateTime = if (date == LocalDate.now()) LocalDateTime.now() else date.atTime(12, 0),
                 type = "ACTIVITY",
@@ -233,6 +237,40 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
     fun deletePlanSnapshots(ids: List<Long>) {
         viewModelScope.launch {
             repository.deletePlanSnapshots(ids)
+        }
+    }
+
+    fun snoozeActivity(activity: Activity, fromDate: LocalDate, toDate: LocalDate) {
+        viewModelScope.launch {
+            // Mark original as skipped
+            val skipEntry = HistoryEntry(
+                dateTime = fromDate.atTime(12, 0),
+                type = "ACTIVITY",
+                name = activity.name,
+                description = activity.description,
+                notes = "Snoozed to ${toDate.format(java.time.format.DateTimeFormatter.ofPattern("MMM d"))}",
+                status = HistoryStatus.SKIPPED
+            )
+            repository.insertHistoryEntry(skipEntry)
+
+            // Schedule for new date
+            repository.insertAdHocActivity(
+                AdHocActivity(
+                    activityId = activity.id,
+                    scheduledDate = toDate.atTime(12, 0)
+                )
+            )
+        }
+    }
+
+    fun scheduleAdHocActivity(activity: Activity, date: LocalDate) {
+        viewModelScope.launch {
+            repository.insertAdHocActivity(
+                AdHocActivity(
+                    activityId = activity.id,
+                    scheduledDate = date.atTime(12, 0)
+                )
+            )
         }
     }
 }

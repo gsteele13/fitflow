@@ -60,6 +60,13 @@ data class PlanActivitySnapshot(
     val isActive: Boolean
 )
 
+@Entity(tableName = "ad_hoc_activities")
+data class AdHocActivity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val activityId: Long,
+    val scheduledDate: LocalDateTime
+)
+
 data class PlanActivityWithDetails(
     val id: Long,
     val planId: Long,

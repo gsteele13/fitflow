@@ -46,6 +46,8 @@ public final class WorkoutDao_Impl implements WorkoutDao {
 
   private final Converters __converters = new Converters();
 
+  private final EntityInsertionAdapter<AdHocActivity> __insertionAdapterOfAdHocActivity;
+
   private final EntityInsertionAdapter<HistoryEntry> __insertionAdapterOfHistoryEntry;
 
   private final EntityInsertionAdapter<PlanSnapshot> __insertionAdapterOfPlanSnapshot;
@@ -59,6 +61,8 @@ public final class WorkoutDao_Impl implements WorkoutDao {
   private final EntityDeletionOrUpdateAdapter<PlanActivity> __updateAdapterOfPlanActivity;
 
   private final EntityDeletionOrUpdateAdapter<HistoryEntry> __updateAdapterOfHistoryEntry;
+
+  private final SharedSQLiteStatement __preparedStmtOfDeleteAdHocActivity;
 
   private final SharedSQLiteStatement __preparedStmtOfDeletePlan;
 
@@ -130,6 +134,26 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         }
         final int _tmp_1 = entity.isActive() ? 1 : 0;
         statement.bindLong(5, _tmp_1);
+      }
+    };
+    this.__insertionAdapterOfAdHocActivity = new EntityInsertionAdapter<AdHocActivity>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR ABORT INTO `ad_hoc_activities` (`id`,`activityId`,`scheduledDate`) VALUES (nullif(?, 0),?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final AdHocActivity entity) {
+        statement.bindLong(1, entity.getId());
+        statement.bindLong(2, entity.getActivityId());
+        final Long _tmp = __converters.dateToTimestamp(entity.getScheduledDate());
+        if (_tmp == null) {
+          statement.bindNull(3);
+        } else {
+          statement.bindLong(3, _tmp);
+        }
       }
     };
     this.__insertionAdapterOfHistoryEntry = new EntityInsertionAdapter<HistoryEntry>(__db) {
@@ -338,6 +362,14 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         statement.bindLong(8, entity.getId());
       }
     };
+    this.__preparedStmtOfDeleteAdHocActivity = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "DELETE FROM ad_hoc_activities WHERE activityId = ? AND scheduledDate BETWEEN ? AND ?";
+        return _query;
+      }
+    };
     this.__preparedStmtOfDeletePlan = new SharedSQLiteStatement(__db) {
       @Override
       @NonNull
@@ -403,6 +435,25 @@ public final class WorkoutDao_Impl implements WorkoutDao {
         __db.beginTransaction();
         try {
           __insertionAdapterOfPlanActivity.insert(planActivity);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object insertAdHocActivity(final AdHocActivity adHocActivity,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __insertionAdapterOfAdHocActivity.insert(adHocActivity);
           __db.setTransactionSuccessful();
           return Unit.INSTANCE;
         } finally {
@@ -539,6 +590,46 @@ public final class WorkoutDao_Impl implements WorkoutDao {
           return Unit.INSTANCE;
         } finally {
           __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deleteAdHocActivity(final long activityId, final LocalDateTime startOfDay,
+      final LocalDateTime endOfDay, final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final SupportSQLiteStatement _stmt = __preparedStmtOfDeleteAdHocActivity.acquire();
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, activityId);
+        _argIndex = 2;
+        final Long _tmp = __converters.dateToTimestamp(startOfDay);
+        if (_tmp == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindLong(_argIndex, _tmp);
+        }
+        _argIndex = 3;
+        final Long _tmp_1 = __converters.dateToTimestamp(endOfDay);
+        if (_tmp_1 == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindLong(_argIndex, _tmp_1);
+        }
+        try {
+          __db.beginTransaction();
+          try {
+            _stmt.executeUpdateDelete();
+            __db.setTransactionSuccessful();
+            return Unit.INSTANCE;
+          } finally {
+            __db.endTransaction();
+          }
+        } finally {
+          __preparedStmtOfDeleteAdHocActivity.release(_stmt);
         }
       }
     }, $completion);
@@ -752,8 +843,18 @@ public final class WorkoutDao_Impl implements WorkoutDao {
             + "            WHERE h.status IN ('COMPLETED', 'SKIPPED') \n"
             + "            AND h.dateTime BETWEEN ? AND ?\n"
             + "        )\n"
+            + "        UNION\n"
+            + "        SELECT a.*\n"
+            + "        FROM activities a\n"
+            + "        JOIN ad_hoc_activities aha ON a.id = aha.activityId\n"
+            + "        WHERE aha.scheduledDate BETWEEN ? AND ?\n"
+            + "        AND a.name NOT IN (\n"
+            + "            SELECT h.name FROM history h \n"
+            + "            WHERE h.status IN ('COMPLETED', 'SKIPPED') \n"
+            + "            AND h.dateTime BETWEEN ? AND ?\n"
+            + "        )\n"
             + "    ";
-    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 3);
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 7);
     int _argIndex = 1;
     _statement.bindLong(_argIndex, dayOfWeek);
     _argIndex = 2;
@@ -770,8 +871,36 @@ public final class WorkoutDao_Impl implements WorkoutDao {
     } else {
       _statement.bindLong(_argIndex, _tmp_1);
     }
+    _argIndex = 4;
+    final Long _tmp_2 = __converters.dateToTimestamp(startOfDay);
+    if (_tmp_2 == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp_2);
+    }
+    _argIndex = 5;
+    final Long _tmp_3 = __converters.dateToTimestamp(endOfDay);
+    if (_tmp_3 == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp_3);
+    }
+    _argIndex = 6;
+    final Long _tmp_4 = __converters.dateToTimestamp(startOfDay);
+    if (_tmp_4 == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp_4);
+    }
+    _argIndex = 7;
+    final Long _tmp_5 = __converters.dateToTimestamp(endOfDay);
+    if (_tmp_5 == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp_5);
+    }
     return CoroutinesRoom.createFlow(__db, false, new String[] {"activities", "plan_activities",
-        "plans", "history"}, new Callable<List<Activity>>() {
+        "plans", "history", "ad_hoc_activities"}, new Callable<List<Activity>>() {
       @Override
       @NonNull
       public List<Activity> call() throws Exception {

@@ -89,6 +89,11 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
         workoutDao.deletePlanSnapshots(ids)
     }
 
+    suspend fun insertAdHocActivity(adHocActivity: AdHocActivity) = workoutDao.insertAdHocActivity(adHocActivity)
+
+    suspend fun deleteAdHocActivity(activityId: Long, startOfDay: LocalDateTime, endOfDay: LocalDateTime) = 
+        workoutDao.deleteAdHocActivity(activityId, startOfDay, endOfDay)
+
     fun getHistoryInRange(start: LocalDate, end: LocalDate): Flow<List<HistoryEntry>> {
         val startDateTime = start.atStartOfDay()
         val endDateTime = end.atTime(23, 59, 59)

@@ -77,6 +77,10 @@ fun ScheduleScreen(viewModel: WorkoutViewModel = viewModel()) {
                 viewModel.addUnscheduledActivity(activity.name, activity.description, selectedDate, "")
                 showAddDialog = false
             },
+            onPlanAdHoc = { activity ->
+                viewModel.scheduleAdHocActivity(activity, selectedDate)
+                showAddDialog = false
+            },
             availableActivities = activitiesInPlans
         )
     }
@@ -88,6 +92,7 @@ fun DaySchedule(date: LocalDate, viewModel: WorkoutViewModel) {
     
     var selectedActivity by remember { mutableStateOf<Activity?>(null) }
     var showOptionsDialog by remember { mutableStateOf(false) }
+    var showSnoozeDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -123,11 +128,55 @@ fun DaySchedule(date: LocalDate, viewModel: WorkoutViewModel) {
                 viewModel.skipActivity(selectedActivity!!, date)
                 showOptionsDialog = false
             },
-            onSnooze = { /* Handle snooze */
+            onSnooze = {
                 showOptionsDialog = false
+                showSnoozeDialog = true
             }
         )
     }
+
+    if (showSnoozeDialog && selectedActivity != null) {
+        SnoozeDialog(
+            onDismiss = { showSnoozeDialog = false },
+            onSnooze = { newDate ->
+                viewModel.snoozeActivity(selectedActivity!!, date, newDate)
+                showSnoozeDialog = false
+            },
+            initialDate = date
+        )
+    }
+}
+
+@Composable
+fun SnoozeDialog(
+    onDismiss: () -> Unit,
+    onSnooze: (LocalDate) -> Unit,
+    initialDate: LocalDate
+) {
+    val daysOfWeek = (1..7).map { initialDate.with(DayOfWeek.of(it)) }
+        .filter { it.isAfter(initialDate) || it.isEqual(initialDate) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Snooze Activity") },
+        text = {
+            Column {
+                Text("Reschedule to:")
+                Spacer(modifier = Modifier.height(8.dp))
+                LazyColumn {
+                    items(daysOfWeek) { date ->
+                        ListItem(
+                            headlineContent = { Text(date.format(DateTimeFormatter.ofPattern("EEEE, MMM d"))) },
+                            modifier = Modifier.clickable { onSnooze(date) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
 }
 
 @Composable
@@ -195,9 +244,10 @@ fun AddActivityOrNoteDialog(
     onAddNote: (String) -> Unit,
     onAddUnscheduled: (String, String) -> Unit,
     onAddFromPlan: (Activity) -> Unit,
+    onPlanAdHoc: (Activity) -> Unit,
     availableActivities: List<Activity>
 ) {
-    var dialogMode by remember { mutableStateOf("MENU") } // MENU, NOTE, UNSCHEDULED, FROM_PLAN
+    var dialogMode by remember { mutableStateOf("MENU") } // MENU, NOTE, UNSCHEDULED, FROM_PLAN, PLAN_AD_HOC
     var text1 by remember { mutableStateOf("") }
     var text2 by remember { mutableStateOf("") }
 
@@ -205,9 +255,10 @@ fun AddActivityOrNoteDialog(
         "MENU" -> {
             AlertDialog(
                 onDismissRequest = onDismiss,
-                title = { Text("Add item to history:") },
                 text = {
                     Column {
+                        Text("Add to History", style = MaterialTheme.typography.titleSmall)
+                        Spacer(modifier = Modifier.height(4.dp))
                         Button(onClick = { dialogMode = "UNSCHEDULED" }, modifier = Modifier.fillMaxWidth()) {
                             Text("Add Unscheduled Activity")
                         }
@@ -218,6 +269,13 @@ fun AddActivityOrNoteDialog(
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { dialogMode = "NOTE" }, modifier = Modifier.fillMaxWidth()) {
                             Text("Add Note")
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Plan ad-hoc activity", style = MaterialTheme.typography.titleSmall)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Button(onClick = { dialogMode = "PLAN_AD_HOC" }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Schedule Activity for this day")
                         }
                     }
                 },
@@ -270,6 +328,25 @@ fun AddActivityOrNoteDialog(
                             ListItem(
                                 headlineContent = { Text(activity.name) },
                                 modifier = Modifier.clickable { onAddFromPlan(activity) }
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { dialogMode = "MENU" }) { Text("Back") }
+                }
+            )
+        }
+        "PLAN_AD_HOC" -> {
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text("Schedule Activity for this day") },
+                text = {
+                    LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
+                        items(availableActivities) { activity ->
+                            ListItem(
+                                headlineContent = { Text(activity.name) },
+                                modifier = Modifier.clickable { onPlanAdHoc(activity) }
                             )
                         }
                     }
